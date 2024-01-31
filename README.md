@@ -4,7 +4,7 @@ Command line pixel sorter.
 
 ## Installation
 
-Precompiled binaries for Windows, macOS and Linux can be downloaded via [releases](https://github.com/MaRcR11/gopxsort/releases). You can also download for builds on the master branch.
+Precompiled binaries for Windows and Linux can be downloaded via [releases](https://github.com/MaRcR11/gopxsort/releases). You can also download for builds on the master branch.
 
 
 ## Usage
