@@ -17,9 +17,9 @@ FLAGS:
         -h, --help                      Prints help information
 
 OPTIONS:
-        -i, --input <input>             Sets the input file
+        -i, --input <input>             Sets the input file 
         -o, --output <output>           Sets the output file
-        -t, --threshold <threshold>     Sets threshold of sorting
+        -t, --threshold <threshold>     Sets threshold of sorting  [default: 0] [possbile values: 0-255]
 ```
 
 ## Examples
