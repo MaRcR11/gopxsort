@@ -150,7 +150,7 @@ func main() {
 
 	sortedImg := image.NewRGBA(img.Bounds())
 
-	printInfo(fmt.Sprintf("Sorting %dx%d image rightwards based on luma %d", img.Bounds().Max.X, img.Bounds().Max.Y, *luminanceThreshold))
+	printInfo(fmt.Sprintf("Sorting %dx%d image rightwards based on threshold %d", img.Bounds().Max.X, img.Bounds().Max.Y, *luminanceThreshold))
 	pixelSort(sortedImg, img, uint32(*luminanceThreshold))
 
 	printInfo(fmt.Sprintf("Saved image to: %s", *outputFileName))
