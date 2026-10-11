@@ -45,7 +45,7 @@ jobs:
         uses: actions/configure-pages@v5
 
       - name: Build the site
-        run: hugo --minify --source site ${{ steps.pages.outputs.base_url && format('--baseURL {0}/', steps.pages.outputs.base_url) || '' }}
+        run: hugo --minify --source site
 
       - if: github.event_name != 'pull_request'
         uses: actions/upload-pages-artifact@v3
