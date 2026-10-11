@@ -24,6 +24,10 @@ func TestParseOptions(t *testing.T) {
 	if _, err := parseOptions([]string{"--bogus", "1"}, spec); err == nil {
 		t.Fatal("expected error for unknown option")
 	}
+	j, _ := pipeline.Lookup("jpeg")
+	if o, err := parseOptions([]string{"--quality", "40", "-q", "80"}, j); err != nil || o.quality != 80 || !slices.Equal(o.rest, []string{"quality=40"}) {
+		t.Fatalf("op parameter vs global flag: %+v %v", o, err)
+	}
 	b, _ := pipeline.Lookup("brightness")
 	if o, err := parseOptions([]string{"-0.2"}, b); err != nil || !slices.Equal(o.rest, []string{"-0.2"}) {
 		t.Fatalf("negative positional: %+v %v", o, err)
