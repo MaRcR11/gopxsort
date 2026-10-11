@@ -13,19 +13,20 @@ Original | Sorted by hue between edges | Spiral sort | Animated sweep
 - **Pixel sorting**, modelled on the usual tools (satyarth/pixelsort, ASDF, Acerola):
   - 13 sort keys: lightness, luminance, hue, saturation, value, chroma, single channels, and more.
   - Interval functions: threshold, random, waves, edges, none.
-  - Paths: straight lines at any angle, sine waves, spirals, concentric rings, radial rays.
-  - Span modes: sort, shuffle, average, gradient, smear.
-  - Masks, reverse order, randomness, reproducible seeds.
-- **39 operations** in total:
+  - Paths: straight lines at any angle, sine waves, flow fields, contours, spirals, Hilbert curves, concentric rings, radial rays.
+  - Span modes: sort, shuffle, average, gradient, smear, per-channel, mirror.
+  - Tile sorting, masks, intervals taken from another image, reverse order, randomness, reproducible seeds.
+- **51 operations** in total:
   - Color: invert, posterize, hue, gradient map, ...
-  - Glitch: RGB shift, chromatic aberration, slice glitch, block shuffle, JPEG corruption, melt, wave, scanlines, noise.
+  - Glitch: RGB shift, chromatic aberration, slice glitch, block shuffle, JPEG corruption, data bending, echo, interlace, pixel scatter, VHS tracking, melt, wave, scanlines, noise.
+  - Distortion: displacement maps, swirl, ripple, bulge/pinch, polar coordinates, CRT curvature, slit-scan.
   - Retro: 10 dithering algorithms with retro palettes, median-cut quantization.
   - Artistic: halftone, bloom, oil paint, kaleidoscope.
   - Geometry: resize, crop, pixelate, mirror, flip, rotate.
   - Filters: blur, sharpen, edges, vignette.
 - **Pipelines**: chain operations, e.g. `"sort angle=90 | glitch | dither palette=gameboy"`.
   `mix` blends the result with the original, and `resize original` scales back to the input size.
-- **14 presets**: ready-made looks such as `@vhs`, `@vaporwave`, `@crt`, `@gameboy` and `@chunky`.
+- **16 presets**: ready-made looks such as `@vhs`, `@vaporwave`, `@crt`, `@gameboy`, `@planet` and `@chunky`.
 - **Animation**: sweep any parameter with `{from..to}` to create GIFs or frame sequences.
   Animated GIF input is processed frame by frame.
 - **Formats**: reads PNG, JPEG, GIF, BMP, TIFF and WebP; writes all of them except WebP.
@@ -118,14 +119,20 @@ The original interface still works: `gopxsort -i img/city/city.jpg -o out.jpg -t
 | `threshold-key` | any key | lightness | threshold: which value is compared |
 | `length` | pixels | 50 | random / waves: span length |
 | `edge` | 0–1 | 0.25 | edges: edge strength that stops a span |
-| `path` | linear, wave, spiral, concentric, radial | linear | how the image is traversed |
+| `path` | linear, wave, flow, contour, spiral, hilbert, concentric, radial | linear | how the image is traversed |
 | `angle` | degrees | 0 | linear: 0 = left→right, 90 = bottom→top, any angle works |
-| `amplitude`, `wavelength`, `vertical` | | 20, 200, false | wave path |
+| `amplitude`, `wavelength` | pixels | 20, 200 | wave path |
+| `vertical` | flag | | wave / flow / contour path: run the lines vertically |
+| `flow-scale` | pixels | 150 | flow path: size of the swirls |
+| `warp` | pixels | 60 | flow / contour path: how far lines bend |
+| `contour-blur` | pixels | 4 | contour path: smoothing of the brightness that bends the lines |
 | `spacing` | pixels | 4 | spiral path: distance between turns |
 | `cx`, `cy` | 0–1 | 0.5, 0.5 | center of spiral / concentric / radial paths |
-| `mode` | sort, shuffle, average, gradient, smear | sort | what happens to each span |
+| `mode` | sort, shuffle, average, gradient, smear, channels, mirror | sort | what happens to each span |
 | `reverse` | flag | | sort high→low |
 | `randomness` | 0–1 | 0 | chance to skip a span |
+| `tile` | pixels | 1 | sort square tiles of this size instead of single pixels |
+| `interval-image` | image file | | take the intervals from another image instead of the input |
 | `mask`, `invert-mask` | image file | | only sort the white (or black) areas of a mask |
 
 ### All operations
@@ -134,7 +141,8 @@ The original interface still works: `gopxsort -i img/city/city.jpg -o out.jpg -t
 | ----- | ---------- |
 | Sorting | `sort` |
 | Color | `invert`, `grayscale`, `threshold`, `posterize`, `brightness`, `contrast`, `gamma`, `saturation`, `hue`, `solarize`, `swap` (channel swap), `gradientmap` |
-| Glitch | `shift` (RGB split), `aberration`, `glitch` (slice displacement), `blocks` (block shuffle), `jpeg` (data corruption), `melt`, `wave`, `scanlines`, `noise` |
+| Glitch | `shift` (RGB split), `aberration`, `glitch` (slice displacement), `blocks` (block shuffle), `jpeg` (data corruption), `bend` (data bending), `echo`, `interlace`, `scatter`, `tracking` (VHS), `melt`, `wave`, `scanlines`, `noise` |
+| Distortion | `displace`, `swirl`, `ripple`, `bulge`, `polar`, `curvature`, `slitscan` |
 | Retro | `dither` with `floyd`, `atkinson`, `jarvis`, `stucki`, `burkes`, `sierra`, `bayer2/4/8` or `none`, palettes `bw`, `gray4`, `gameboy`, `cga`, `pico8`, `c64`, `sepia`, `vapor`, `websafe` or your own `#hex,#hex,...`; `quantize` (best N colors) |
 | Artistic | `halftone`, `bloom`, `oilpaint`, `kaleidoscope` |
 | Geometry | `resize`, `crop`, `pixelate`, `mirror`, `flip`, `rotate` |
@@ -149,8 +157,8 @@ The original interface still works: `gopxsort -i img/city/city.jpg -o out.jpg -t
 | `@spiral` | `sort path=spiral spacing=6 interval=edges edge=0.2` |
 | `@melt` | `sort angle=270 interval=edges edge=0.15 mode=smear \| melt shift=120` |
 | `@glitch` | `sort lower=0.35 randomness=0.5 \| glitch slices=30 \| shift \| jpeg amount=2` |
-| `@vhs` | `shift \| wave \| noise \| scanlines \| saturation` |
-| `@crt` | `bloom \| aberration \| scanlines \| vignette` |
+| `@vhs` | `shift \| wave \| tracking \| noise \| scanlines \| saturation` |
+| `@crt` | `bloom \| aberration \| scanlines \| curvature \| vignette` |
 | `@vaporwave` | `sort key=hue angle=90 \| gradientmap \| mix 0.6 \| scanlines` |
 | `@dream` | `sort path=concentric \| bloom \| saturation` |
 | `@gameboy` | `resize scale=0.33 \| dither atkinson palette=gameboy \| resize original filter=nearest` |
@@ -158,6 +166,8 @@ The original interface still works: `gopxsort -i img/city/city.jpg -o out.jpg -t
 | `@chunky` | `resize scale=0.125 \| sort angle=90 \| resize original filter=nearest` |
 | `@newspaper` | `grayscale \| contrast 1.4 \| halftone size=6` |
 | `@oil` | `oilpaint radius=4 \| saturation 1.2` |
+| `@planet` | `polar \| vignette 0.4` |
+| `@databend` | `bend delay=12347 feedback=0.6 \| interlace shift=6` |
 
 `gopxsort presets` prints the full pipelines.
 
@@ -225,7 +235,7 @@ _ = imageio.SaveAnimation("out.gif", out)
 ## Gallery
 
 All examples start from [img/city/city.jpg](img/city/city.jpg).
-**[docs/EXAMPLES.md](docs/EXAMPLES.md)** has 98 examples covering every sort option, operation, preset and animation, each with the full command and the equivalent Go library code.
+**[docs/EXAMPLES.md](docs/EXAMPLES.md)** has 132 examples covering every sort option, operation, preset and animation, each with the full command and the equivalent Go library code.
 
 | | | |
 |-|-|-|
@@ -233,7 +243,9 @@ All examples start from [img/city/city.jpg](img/city/city.jpg).
 | ![](img/examples/sort_path_concentric.jpg)<br>`sort --path concentric --lower 0.1` | ![](img/examples/sort_path_wave.jpg)<br>`sort --path wave --amplitude 40 --wavelength 300 --lower 0.1` | ![](img/examples/sort_mode_gradient.jpg)<br>`sort --mode gradient --interval random --length 60 --angle 90` |
 | ![](img/examples/glitch.jpg)<br>`glitch --slices 30 --shift 0.15` | ![](img/examples/jpeg.jpg)<br>`jpeg --amount 15 --quality 40 --seed 2` | ![](img/examples/melt.jpg)<br>`melt --shift 150` |
 | ![](img/examples/dither.jpg)<br>`dither --method atkinson --palette gameboy` | ![](img/examples/kaleidoscope.jpg)<br>`kaleidoscope --segments 6` | ![](img/examples/halftone.jpg)<br>`halftone --size 8 --color` |
+| ![](img/examples/polar.jpg)<br>`polar` | ![](img/examples/bend__strong.jpg)<br>`bend --delay 12347 --feedback 0.6` | ![](img/examples/swirl.jpg)<br>`swirl --degrees 180` |
 | ![](img/examples/preset_vaporwave.jpg)<br>`@vaporwave` | ![](img/examples/preset_crt.jpg)<br>`@crt` | ![](img/examples/preset_glitch.jpg)<br>`@glitch` |
+| ![](img/examples/sort_path_flow_liquid.jpg)<br>`sort --path flow --interval none` | ![](img/examples/sort_mode_channels_all.jpg)<br>`sort --mode channels --interval none --angle 270` | ![](img/examples/sort_tile_vertical.jpg)<br>`sort --tile 16 --angle 270 --lower 0.1` |
 | ![](img/examples/pipeline_blocky.jpg)<br>`run "resize scale=0.2 \| sort angle=90 lower=0.1 \| resize original filter=nearest \| aberration"` | ![](img/examples/preset_chunky.jpg)<br>`@chunky` | ![](img/examples/anim_kaleidoscope.gif)<br>`run --frames 16 --pingpong "resize width=480 \| kaleidoscope rotation={0..60}"` |
 
 ## Project structure

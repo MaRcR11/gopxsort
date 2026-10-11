@@ -20,9 +20,11 @@ const (
 	ModeAverage
 	ModeGradient
 	ModeSmear
+	ModeChannels
+	ModeMirror
 )
 
-var modeNames = []string{"sort", "shuffle", "average", "gradient", "smear"}
+var modeNames = []string{"sort", "shuffle", "average", "gradient", "smear", "channels", "mirror"}
 
 func (m Mode) String() string {
 	if int(m) >= 0 && int(m) < len(modeNames) {
@@ -48,6 +50,7 @@ type Options struct {
 	Mask       image.Image
 	InvertMask bool
 	Seed       int64
+	Tile       int
 }
 
 func DefaultOptions() Options {
@@ -89,7 +92,12 @@ func SortInPlace(img *image.NRGBA, opts Options) {
 		panic("sorter: SortInPlace needs an NRGBA image with origin (0, 0) and no row padding")
 	}
 
-	lines := o.Path.Lines(w, h)
+	if o.Tile > 1 {
+		sortTiles(img, o)
+		return
+	}
+
+	lines := pathLines(o.Path, img)
 	split := o.Interval.Bind(img)
 	var mask []bool
 	if o.Mask != nil {
@@ -131,16 +139,55 @@ func SortInPlace(img *image.NRGBA, opts Options) {
 	})
 }
 
+func pathLines(p Path, img *image.NRGBA) [][]int {
+	if ip, ok := p.(ImagePath); ok {
+		return ip.LinesFor(img)
+	}
+	return p.Lines(img.Rect.Dx(), img.Rect.Dy())
+}
+
 type keyed struct {
 	k float64
-	c color.NRGBA
+	i int
+}
+
+func permutation(o Options, seg []color.NRGBA, rng *rand.Rand, buf []keyed) ([]int, []keyed) {
+	perm := make([]int, len(seg))
+	if o.Mode == ModeShuffle {
+		for i := range perm {
+			perm[i] = i
+		}
+		rng.Shuffle(len(perm), func(i, j int) { perm[i], perm[j] = perm[j], perm[i] })
+		return perm, buf
+	}
+	buf = buf[:0]
+	for i, c := range seg {
+		buf = append(buf, keyed{o.Key(c), i})
+	}
+	if o.Reverse {
+		slices.SortStableFunc(buf, func(a, b keyed) int { return cmp.Compare(b.k, a.k) })
+	} else {
+		slices.SortStableFunc(buf, func(a, b keyed) int { return cmp.Compare(a.k, b.k) })
+	}
+	if o.Mode == ModeMirror {
+		n := len(buf)
+		for i, k := range buf {
+			if i%2 == 0 {
+				perm[i/2] = k.i
+			} else {
+				perm[n-1-i/2] = k.i
+			}
+		}
+		return perm, buf
+	}
+	for i, k := range buf {
+		perm[i] = k.i
+	}
+	return perm, buf
 }
 
 func apply(o Options, seg []color.NRGBA, rng *rand.Rand, buf []keyed) []keyed {
 	switch o.Mode {
-	case ModeShuffle:
-		rng.Shuffle(len(seg), func(i, j int) { seg[i], seg[j] = seg[j], seg[i] })
-
 	case ModeAverage:
 		var r, g, b, a int
 		for _, c := range seg {
@@ -179,21 +226,110 @@ func apply(o Options, seg []color.NRGBA, rng *rand.Rand, buf []keyed) []keyed {
 			seg[i] = src
 		}
 
+	case ModeChannels:
+		ch := make([]uint8, len(seg))
+		for c := 0; c < 3; c++ {
+			for i, p := range seg {
+				ch[i] = [3]uint8{p.R, p.G, p.B}[c]
+			}
+			if o.Reverse {
+				slices.SortFunc(ch, func(a, b uint8) int { return int(b) - int(a) })
+			} else {
+				slices.Sort(ch)
+			}
+			for i := range seg {
+				switch c {
+				case 0:
+					seg[i].R = ch[i]
+				case 1:
+					seg[i].G = ch[i]
+				default:
+					seg[i].B = ch[i]
+				}
+			}
+		}
+
 	default:
-		buf = buf[:0]
-		for _, c := range seg {
-			buf = append(buf, keyed{o.Key(c), c})
-		}
-		if o.Reverse {
-			slices.SortStableFunc(buf, func(a, b keyed) int { return cmp.Compare(b.k, a.k) })
-		} else {
-			slices.SortStableFunc(buf, func(a, b keyed) int { return cmp.Compare(a.k, b.k) })
-		}
-		for i := range seg {
-			seg[i] = buf[i].c
+		var perm []int
+		perm, buf = permutation(o, seg, rng, buf)
+		src := slices.Clone(seg)
+		for i, p := range perm {
+			seg[i] = src[p]
 		}
 	}
 	return buf
+}
+
+func sortTiles(img *image.NRGBA, o Options) {
+	size := o.Tile
+	w, h := img.Rect.Dx(), img.Rect.Dy()
+	tw, th := w/size, h/size
+	if tw == 0 || th == 0 {
+		return
+	}
+	small := image.NewNRGBA(image.Rect(0, 0, tw, th))
+	for ty := 0; ty < th; ty++ {
+		for tx := 0; tx < tw; tx++ {
+			var sum [4]int
+			for y := ty * size; y < (ty+1)*size; y++ {
+				for x := tx * size; x < (tx+1)*size; x++ {
+					for c := 0; c < 4; c++ {
+						sum[c] += int(img.Pix[(y*w+x)*4+c])
+					}
+				}
+			}
+			n := size * size
+			imgutil.Set(small.Pix, ty*tw+tx, color.NRGBA{uint8(sum[0] / n), uint8(sum[1] / n), uint8(sum[2] / n), uint8(sum[3] / n)})
+		}
+	}
+	lines := pathLines(o.Path, small)
+	split := o.Interval.Bind(small)
+	var mask []bool
+	if o.Mask != nil {
+		mask = maskBits(o.Mask, tw, th, o.InvertMask)
+	}
+	src := imgutil.ToNRGBA(img)
+	moveTile := func(dst, from int) {
+		dx, dy := (dst%tw)*size, (dst/tw)*size
+		sx, sy := (from%tw)*size, (from/tw)*size
+		for y := 0; y < size; y++ {
+			copy(img.Pix[((dy+y)*w+dx)*4:((dy+y)*w+dx+size)*4], src.Pix[((sy+y)*w+sx)*4:])
+		}
+	}
+	imgutil.ParallelEach(len(lines), func(li int) {
+		offs := lines[li]
+		line := &Line{
+			Index:   li,
+			Offsets: offs,
+			Pixels:  make([]color.NRGBA, len(offs)),
+			Rand:    rand.New(rand.NewSource(lineSeed(o.Seed, li))),
+			width:   tw,
+		}
+		for i, p := range offs {
+			line.Pixels[i] = imgutil.At(small.Pix, p)
+		}
+		spans := split(line)
+		if mask != nil {
+			spans = clipToMask(spans, offs, mask)
+		}
+		var buf []keyed
+		for _, s := range spans {
+			s.Start, s.End = max(s.Start, 0), min(s.End, len(offs))
+			if s.End-s.Start < 2 {
+				continue
+			}
+			if o.Randomness > 0 && line.Rand.Float64() < o.Randomness {
+				continue
+			}
+			var perm []int
+			perm, buf = permutation(o, line.Pixels[s.Start:s.End], line.Rand, buf)
+			for i, p := range perm {
+				if i != p {
+					moveTile(offs[s.Start+i], offs[s.Start+p])
+				}
+			}
+		}
+	})
 }
 
 func lerp(a, b color.NRGBA, t float64) color.NRGBA {

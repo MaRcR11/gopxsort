@@ -115,3 +115,23 @@ func chop(n int, next func() int) []Span {
 	}
 	return spans
 }
+
+func FromImage(src image.Image, inner Interval) Interval { return fromImage{src, inner} }
+
+type fromImage struct {
+	src   image.Image
+	inner Interval
+}
+
+func (f fromImage) Bind(img *image.NRGBA) Splitter {
+	other := imgutil.ResizeNearest(f.src, img.Rect.Dx(), img.Rect.Dy())
+	split := f.inner.Bind(other)
+	return func(l *Line) []Span {
+		c := *l
+		c.Pixels = make([]color.NRGBA, len(l.Offsets))
+		for i, p := range l.Offsets {
+			c.Pixels[i] = imgutil.At(other.Pix, p)
+		}
+		return split(&c)
+	}
+}

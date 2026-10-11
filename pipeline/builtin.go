@@ -45,10 +45,11 @@ func init() {
 	registerGlitch()
 	registerFilters()
 	registerExtra()
+	registerDistort()
 }
 
 var intervalNames = []string{"threshold", "random", "waves", "edges", "none"}
-var pathNames = []string{"linear", "wave", "concentric", "radial", "spiral"}
+var pathNames = []string{"linear", "wave", "concentric", "radial", "spiral", "flow", "contour", "hilbert"}
 
 func registerSort() {
 	Register(Spec{
@@ -66,13 +67,18 @@ func registerSort() {
 			float("angle", "0", "linear path: direction in degrees (0 = left→right, 90 = bottom→top)"),
 			float("amplitude", "20", "wave path: amplitude in pixels"),
 			float("wavelength", "200", "wave path: wavelength in pixels"),
-			boolean("vertical", "wave path: run the waves vertically"),
+			boolean("vertical", "wave/flow/contour path: run the lines vertically"),
 			float("cx", "0.5", "concentric/radial/spiral path: center x (0..1)"),
 			float("cy", "0.5", "concentric/radial/spiral path: center y (0..1)"),
 			float("spacing", "4", "spiral path: distance between spiral turns in pixels"),
+			float("flow-scale", "150", "flow path: size of the swirls in pixels"),
+			float("warp", "60", "flow/contour path: how far lines bend, in pixels"),
+			integer("contour-blur", "4", "contour path: smoothing of the brightness that bends the lines"),
 			str("mode", "sort", "what happens to each span", sorter.ModeNames()...),
 			boolean("reverse", "sort from high to low"),
 			float("randomness", "0", "probability (0..1) that a span is skipped"),
+			integer("tile", "1", "sort square tiles of this size instead of single pixels"),
+			str("interval-image", "", "image file whose pixels decide the intervals instead of the input"),
 			str("mask", "", "image file; only its bright areas are sorted"),
 			boolean("invert-mask", "sort the dark areas of the mask instead"),
 			seedParam,
@@ -85,6 +91,7 @@ func registerSort() {
 				Randomness: a.Float("randomness"),
 				InvertMask: a.Bool("invert-mask"),
 				Seed:       a.Seed(),
+				Tile:       a.Int("tile"),
 			}
 			switch a.String("interval") {
 			case "threshold":
@@ -112,8 +119,21 @@ func registerSort() {
 				o.Path = sorter.Radial(a.Float("cx"), a.Float("cy"))
 			case "spiral":
 				o.Path = sorter.Spiral(a.Float("cx"), a.Float("cy"), a.Float("spacing"))
+			case "flow":
+				o.Path = sorter.FlowField(a.Float("flow-scale"), a.Float("warp"), a.Bool("vertical"), a.Seed())
+			case "contour":
+				o.Path = sorter.Contour(a.Float("warp"), a.Int("contour-blur"), a.Bool("vertical"))
+			case "hilbert":
+				o.Path = sorter.Hilbert()
 			default:
 				return nil, fmt.Errorf("sort: unknown path %q (choose from %s)", a.String("path"), strings.Join(pathNames, ", "))
+			}
+			if f := a.String("interval-image"); f != "" {
+				src, err := imageio.Load(f)
+				if err != nil {
+					return nil, fmt.Errorf("sort: interval-image: %w", err)
+				}
+				o.Interval = sorter.FromImage(src, o.Interval)
 			}
 			if m := a.String("mask"); m != "" {
 				mask, err := imageio.Load(m)
