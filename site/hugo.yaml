@@ -1,0 +1,71 @@
+baseURL: "https://marcr11.github.io/gopxsort/"
+title: gopxsort
+locale: en
+enableRobotsTXT: true
+enableGitInfo: false
+
+module:
+  hugoVersion:
+    min: "0.146.0"
+  imports:
+    - path: github.com/imfing/hextra
+
+markup:
+  highlight:
+    noClasses: false
+  goldmark:
+    renderer:
+      unsafe: true
+    parser:
+      attribute:
+        title: true
+
+menu:
+  main:
+    - name: Docs
+      pageRef: /docs
+      weight: 1
+    - name: Gallery
+      pageRef: /docs/gallery
+      weight: 2
+    - name: Reference
+      pageRef: /docs/reference
+      weight: 3
+    - name: Search
+      weight: 4
+      params:
+        type: search
+    - name: GitHub
+      weight: 5
+      url: "https://github.com/MaRcR11/gopxsort"
+      params:
+        icon: github
+
+params:
+  description: Pixel sorting and glitch art for Go, as a command line tool and a library.
+  navbar:
+    displayTitle: true
+    displayLogo: false
+    width: wide
+  page:
+    width: wide
+  theme:
+    default: system
+    displayToggle: true
+  footer:
+    enable: true
+    displayCopyright: false
+    displayPoweredBy: true
+  search:
+    enable: true
+    type: flexsearch
+    flexsearch:
+      index: content
+      tokenize: forward
+  editURL:
+    enable: true
+    base: "https://github.com/MaRcR11/gopxsort/edit/main/site/content"
+  highlight:
+    copy:
+      enable: true
+      display: hover

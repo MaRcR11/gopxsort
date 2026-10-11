@@ -2,9 +2,12 @@
 
 Pixel sorting and glitch art for Go: a command line tool and a library.
 
+**[Documentation and gallery →](https://marcr11.github.io/gopxsort/)**
+
 [![Go Reference](https://pkg.go.dev/badge/github.com/MaRcR11/gopxsort.svg)](https://pkg.go.dev/github.com/MaRcR11/gopxsort)
 [![CI](https://github.com/MaRcR11/gopxsort/actions/workflows/ci.yml/badge.svg)](https://github.com/MaRcR11/gopxsort/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![Docs](https://img.shields.io/badge/docs-gallery-blue)](https://marcr11.github.io/gopxsort/)
 
 Original | Sorted by hue between edges | Spiral sort | Animated sweep
 -------- | ----------------------------- | ----------- | --------------
@@ -234,19 +237,15 @@ _ = imageio.SaveAnimation("out.gif", out)
 
 ## Gallery
 
+**[See the full gallery on the docs site →](https://marcr11.github.io/gopxsort/docs/gallery/)** It has 132 examples covering every sort option, operation, preset and animation, each with the command and the equivalent Go code.
+
 All examples start from [img/city/city.jpg](img/city/city.jpg).
-**[docs/EXAMPLES.md](docs/EXAMPLES.md)** has 132 examples covering every sort option, operation, preset and animation, each with the full command and the equivalent Go library code.
 
 | | | |
 |-|-|-|
 | ![](img/examples/sort_vertical.jpg)<br>`sort --angle 270 --lower 0.1 --upper 0.9` | ![](img/examples/sort_random_vertical.jpg)<br>`sort --interval random --length 100 --angle 270 --reverse` | ![](img/examples/sort_mode_smear.jpg)<br>`sort --mode smear --interval edges --edge 0.12 --angle 270` |
-| ![](img/examples/sort_path_concentric.jpg)<br>`sort --path concentric --lower 0.1` | ![](img/examples/sort_path_wave.jpg)<br>`sort --path wave --amplitude 40 --wavelength 300 --lower 0.1` | ![](img/examples/sort_mode_gradient.jpg)<br>`sort --mode gradient --interval random --length 60 --angle 90` |
-| ![](img/examples/glitch.jpg)<br>`glitch --slices 30 --shift 0.15` | ![](img/examples/jpeg.jpg)<br>`jpeg --amount 15 --quality 40 --seed 2` | ![](img/examples/melt.jpg)<br>`melt --shift 150` |
-| ![](img/examples/dither.jpg)<br>`dither --method atkinson --palette gameboy` | ![](img/examples/kaleidoscope.jpg)<br>`kaleidoscope --segments 6` | ![](img/examples/halftone.jpg)<br>`halftone --size 8 --color` |
-| ![](img/examples/polar.jpg)<br>`polar` | ![](img/examples/bend__strong.jpg)<br>`bend --delay 12347 --feedback 0.6` | ![](img/examples/swirl.jpg)<br>`swirl --degrees 180` |
-| ![](img/examples/preset_vaporwave.jpg)<br>`@vaporwave` | ![](img/examples/preset_crt.jpg)<br>`@crt` | ![](img/examples/preset_glitch.jpg)<br>`@glitch` |
-| ![](img/examples/sort_path_flow_liquid.jpg)<br>`sort --path flow --interval none` | ![](img/examples/sort_mode_channels_all.jpg)<br>`sort --mode channels --interval none --angle 270` | ![](img/examples/sort_tile_vertical.jpg)<br>`sort --tile 16 --angle 270 --lower 0.1` |
-| ![](img/examples/pipeline_blocky.jpg)<br>`run "resize scale=0.2 \| sort angle=90 lower=0.1 \| resize original filter=nearest \| aberration"` | ![](img/examples/preset_chunky.jpg)<br>`@chunky` | ![](img/examples/anim_kaleidoscope.gif)<br>`run --frames 16 --pingpong "resize width=480 \| kaleidoscope rotation={0..60}"` |
+| ![](img/examples/sort_path_flow_liquid.jpg)<br>`sort --path flow --interval none` | ![](img/examples/sort_mode_channels_all.jpg)<br>`sort --mode channels --interval none --angle 270` | ![](img/examples/glitch.jpg)<br>`glitch --slices 30 --shift 0.15` |
+| ![](img/examples/polar.jpg)<br>`polar` | ![](img/examples/preset_vaporwave.jpg)<br>`@vaporwave` | ![](img/examples/preset_chunky.jpg)<br>`@chunky` |
 
 ## Project structure
 
@@ -254,13 +253,14 @@ All examples start from [img/city/city.jpg](img/city/city.jpg).
 gopxsort/
 ├── gopxsort.go          shortcuts: Sort, Apply, ApplyFile
 ├── sorter/              pixel sorting engine: keys, intervals, paths, modes
-├── effects/             color, glitch, dithering, artistic and geometry effects
+├── effects/             color, glitch, distortion, dithering, artistic and geometry effects
 ├── pipeline/            operation registry, "op | op" parser, presets, animation
 ├── imageio/             load and save images and animated GIFs
 ├── internal/imgutil/    shared low-level helpers (not public API)
 ├── cmd/gopxsort/        the command line tool
-├── docs/EXAMPLES.md     every example with CLI command and library code
-└── img/                 sample image and gallery
+├── tools/gallery/       generates the docs gallery and checks CLI against library output
+├── site/                the documentation site (Hugo + Hextra)
+└── img/                 sample image and README highlights (not part of the Go module)
 ```
 
 ## Development
@@ -270,6 +270,18 @@ go test ./...                                   # run tests
 go test -race ./...                             # run tests with the race detector
 go test -bench . ./sorter                       # benchmarks
 go test -fuzz FuzzParse -fuzztime 30s ./pipeline   # fuzz the pipeline parser
+```
+
+### Documentation site
+
+The site lives in [site/](site) and is deployed to GitHub Pages on every push to `main`.
+The gallery, the operations reference and their images are generated, not committed.
+
+```bash
+go run ./tools/gallery/gensnippets   # after changing tools/gallery/catalog: regenerate the Go snippets
+go run ./tools/gallery               # render all examples, check CLI == library, write them into site/
+hugo server --source site            # preview at http://localhost:1313/gopxsort/
+go run ./tools/gallery -site "" -readme img/examples   # refresh the README highlight images
 ```
 
 ## License
