@@ -56,7 +56,7 @@ EXAMPLES:
 `
 
 func printUsage(w io.Writer) {
-	fmt.Fprint(w, usage)
+	io.WriteString(w, usage)
 	fmt.Fprintln(w, "\nOPERATIONS:")
 	printOpList(w)
 }
