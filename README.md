@@ -1,6 +1,6 @@
 # sortcery
 
-Pixel sorting and glitch magic for Go: a command line tool and a library. *Formerly gopxsort.*
+Pixel sorting and glitch magic for Go: a command line tool and a library
 
 **[Documentation and gallery →](https://marcr11.github.io/sortcery/)**
 
