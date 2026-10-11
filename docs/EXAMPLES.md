@@ -20,8 +20,10 @@ Images in this page are scaled down to at most 960 pixels wide to keep the repos
 - [Sorting: intervals](#sorting-intervals)
 - [Sorting: paths](#sorting-paths)
 - [Sorting: modes](#sorting-modes)
+- [Sorting: tiles, masks and guide images](#sorting-tiles-masks-and-guide-images)
 - [Color](#color)
 - [Glitch](#glitch)
+- [Distortion](#distortion)
 - [Retro](#retro)
 - [Artistic](#artistic)
 - [Geometry and filters](#geometry-and-filters)
@@ -515,6 +517,113 @@ out := sorter.Sort(img, sorter.Options{
 })
 ```
 
+### Flow field
+
+![Flow field](../img/examples/sort_path_flow.jpg)
+
+```bash
+gopxsort sort -i city.jpg -o out.jpg --path flow --lower 0.1 --seed 7
+```
+
+```go
+out := sorter.Sort(img, sorter.Options{
+	Interval: sorter.Threshold(0.1, 0.8),
+	Path:     sorter.FlowField(150, 60, false, 7),
+})
+```
+
+### Flow field, every pixel
+
+![Flow field, every pixel](../img/examples/sort_path_flow_liquid.jpg)
+
+```bash
+gopxsort sort -i city.jpg -o out.jpg --path flow --interval none --seed 7
+```
+
+```go
+out := sorter.Sort(img, sorter.Options{
+	Interval: sorter.None(),
+	Path:     sorter.FlowField(150, 60, false, 7),
+})
+```
+
+### Vertical flow field
+
+![Vertical flow field](../img/examples/sort_path_flow_vertical.jpg)
+
+```bash
+gopxsort sort -i city.jpg -o out.jpg --path flow --vertical --lower 0.1 --seed 7
+```
+
+```go
+out := sorter.Sort(img, sorter.Options{
+	Interval: sorter.Threshold(0.1, 0.8),
+	Path:     sorter.FlowField(150, 60, true, 7),
+})
+```
+
+### Contour (lines bend around bright shapes)
+
+![Contour (lines bend around bright shapes)](../img/examples/sort_path_contour.jpg)
+
+```bash
+gopxsort sort -i city.jpg -o out.jpg --path contour --warp 300 --contour-blur 10 --lower 0.05
+```
+
+```go
+out := sorter.Sort(img, sorter.Options{
+	Interval: sorter.Threshold(0.05, 0.8),
+	Path:     sorter.Contour(300, 10, false),
+})
+```
+
+### Vertical contour with random intervals
+
+![Vertical contour with random intervals](../img/examples/sort_path_contour_vertical.jpg)
+
+```bash
+gopxsort sort -i city.jpg -o out.jpg --path contour --vertical --warp 200 --interval random --length 120 --seed 7
+```
+
+```go
+out := sorter.Sort(img, sorter.Options{
+	Interval: sorter.Random(120),
+	Path:     sorter.Contour(200, 4, true),
+	Seed:     7,
+})
+```
+
+### Hilbert curve
+
+![Hilbert curve](../img/examples/sort_path_hilbert.jpg)
+
+```bash
+gopxsort sort -i city.jpg -o out.jpg --path hilbert --lower 0.1
+```
+
+```go
+out := sorter.Sort(img, sorter.Options{
+	Interval: sorter.Threshold(0.1, 0.8),
+	Path:     sorter.Hilbert(),
+})
+```
+
+### Hilbert curve with random intervals
+
+![Hilbert curve with random intervals](../img/examples/sort_path_hilbert_random.jpg)
+
+```bash
+gopxsort sort -i city.jpg -o out.jpg --path hilbert --interval random --length 400 --seed 7
+```
+
+```go
+out := sorter.Sort(img, sorter.Options{
+	Interval: sorter.Random(400),
+	Path:     sorter.Hilbert(),
+	Seed:     7,
+})
+```
+
 ## Sorting: modes
 
 ### Shuffle
@@ -580,6 +689,133 @@ out := sorter.Sort(img, sorter.Options{
 	Interval: sorter.Edges(0.12),
 	Path:     sorter.Linear(270),
 	Mode:     sorter.ModeSmear,
+})
+```
+
+### Per-channel sort
+
+![Per-channel sort](../img/examples/sort_mode_channels.jpg)
+
+```bash
+gopxsort sort -i city.jpg -o out.jpg --mode channels --lower 0.1
+```
+
+```go
+out := sorter.Sort(img, sorter.Options{
+	Interval: sorter.Threshold(0.1, 0.8),
+	Mode:     sorter.ModeChannels,
+})
+```
+
+### Per-channel sort, whole columns
+
+![Per-channel sort, whole columns](../img/examples/sort_mode_channels_all.jpg)
+
+```bash
+gopxsort sort -i city.jpg -o out.jpg --mode channels --interval none --angle 270
+```
+
+```go
+out := sorter.Sort(img, sorter.Options{
+	Interval: sorter.None(),
+	Path:     sorter.Linear(270),
+	Mode:     sorter.ModeChannels,
+})
+```
+
+### Mirror sort
+
+![Mirror sort](../img/examples/sort_mode_mirror.jpg)
+
+```bash
+gopxsort sort -i city.jpg -o out.jpg --mode mirror --lower 0.1 --angle 270
+```
+
+```go
+out := sorter.Sort(img, sorter.Options{
+	Interval: sorter.Threshold(0.1, 0.8),
+	Path:     sorter.Linear(270),
+	Mode:     sorter.ModeMirror,
+})
+```
+
+### Mirror sort, whole rows
+
+![Mirror sort, whole rows](../img/examples/sort_mode_mirror_all.jpg)
+
+```bash
+gopxsort sort -i city.jpg -o out.jpg --mode mirror --interval none
+```
+
+```go
+out := sorter.Sort(img, sorter.Options{
+	Interval: sorter.None(),
+	Mode:     sorter.ModeMirror,
+})
+```
+
+## Sorting: tiles, masks and guide images
+
+### Tile sort
+
+![Tile sort](../img/examples/sort_tile.jpg)
+
+```bash
+gopxsort sort -i city.jpg -o out.jpg --tile 24 --interval none
+```
+
+```go
+out := sorter.Sort(img, sorter.Options{
+	Interval: sorter.None(),
+	Tile:     24,
+})
+```
+
+### Vertical tile sort
+
+![Vertical tile sort](../img/examples/sort_tile_vertical.jpg)
+
+```bash
+gopxsort sort -i city.jpg -o out.jpg --tile 16 --angle 270 --lower 0.1
+```
+
+```go
+out := sorter.Sort(img, sorter.Options{
+	Interval: sorter.Threshold(0.1, 0.8),
+	Path:     sorter.Linear(270),
+	Tile:     16,
+})
+```
+
+### Intervals from another image (edges of the kaleidoscope example)
+
+![Intervals from another image (edges of the kaleidoscope example)](../img/examples/sort_interval_image.jpg)
+
+```bash
+gopxsort sort -i city.jpg -o out.jpg --interval edges --edge 0.2 --interval-image img/examples/kaleidoscope.jpg
+```
+
+```go
+guide, err := imageio.Load("img/examples/kaleidoscope.jpg")
+out := sorter.Sort(img, sorter.Options{
+	Interval: sorter.FromImage(guide, sorter.Edges(0.2)),
+})
+```
+
+### Mask (only the white areas of the threshold example)
+
+![Mask (only the white areas of the threshold example)](../img/examples/sort_mask.jpg)
+
+```bash
+gopxsort sort -i city.jpg -o out.jpg --interval none --angle 270 --mask img/examples/threshold.jpg
+```
+
+```go
+mask, err := imageio.Load("img/examples/threshold.jpg")
+out := sorter.Sort(img, sorter.Options{
+	Interval: sorter.None(),
+	Path:     sorter.Linear(270),
+	Mask:     mask,
 })
 ```
 
@@ -838,6 +1074,213 @@ gopxsort noise -i city.jpg -o out.jpg --amount 0.1 --seed 7
 
 ```go
 out := effects.Noise(img, 0.1, false, 7)
+```
+
+### Echo / ghosting
+
+![Echo / ghosting](../img/examples/echo.jpg)
+
+```bash
+gopxsort echo -i city.jpg -o out.jpg --copies 4 --offset 12,0 --decay 0.7
+```
+
+```go
+out := effects.Echo(img, 4, image.Pt(12, 0), 0.7)
+```
+
+### Data bending
+
+![Data bending](../img/examples/bend.jpg)
+
+```bash
+gopxsort bend -i city.jpg -o out.jpg --delay 3001 --feedback 0.4
+```
+
+```go
+out := effects.DataBend(img, 3001, 0.4)
+```
+
+### Data bending, longer delay
+
+![Data bending, longer delay](../img/examples/bend__strong.jpg)
+
+```bash
+gopxsort bend -i city.jpg -o out.jpg --delay 12347 --feedback 0.6
+```
+
+```go
+out := effects.DataBend(img, 12347, 0.6)
+```
+
+### Interlace
+
+![Interlace](../img/examples/interlace.jpg)
+
+```bash
+gopxsort interlace -i city.jpg -o out.jpg --shift 8 --spacing 2 --darken 0.2
+```
+
+```go
+out := effects.Interlace(img, 8, 2, 0.2)
+```
+
+### Pixel scatter
+
+![Pixel scatter](../img/examples/scatter.jpg)
+
+```bash
+gopxsort scatter -i city.jpg -o out.jpg --radius 4 --seed 7
+```
+
+```go
+out := effects.Scatter(img, 4, 7)
+```
+
+### VHS tracking
+
+![VHS tracking](../img/examples/tracking.jpg)
+
+```bash
+gopxsort tracking -i city.jpg -o out.jpg --bands 3 --shift 0.05 --noise 0.3 --seed 7
+```
+
+```go
+out := effects.Tracking(img, 3, 0.05, 0.3, 7)
+```
+
+## Distortion
+
+### Displacement by the image's own brightness
+
+![Displacement by the image's own brightness](../img/examples/displace.jpg)
+
+```bash
+gopxsort displace -i city.jpg -o out.jpg --x 150
+```
+
+```go
+out := effects.Displace(img, nil, 150, 0)
+```
+
+### Displacement by a map image (the kaleidoscope example)
+
+![Displacement by a map image (the kaleidoscope example)](../img/examples/displace__map.jpg)
+
+```bash
+gopxsort displace -i city.jpg -o out.jpg --x 120 --y 60 --map img/examples/kaleidoscope.jpg
+```
+
+```go
+dmap, err := imageio.Load("img/examples/kaleidoscope.jpg")
+out := effects.Displace(img, dmap, 120, 60)
+```
+
+### Swirl
+
+![Swirl](../img/examples/swirl.jpg)
+
+```bash
+gopxsort swirl -i city.jpg -o out.jpg --degrees 180 --radius 0.5
+```
+
+```go
+out := effects.Swirl(img, 180, 0.5)
+```
+
+### Ripple
+
+![Ripple](../img/examples/ripple.jpg)
+
+```bash
+gopxsort ripple -i city.jpg -o out.jpg --amplitude 8 --wavelength 40
+```
+
+```go
+out := effects.Ripple(img, 8, 40)
+```
+
+### Bulge (fisheye)
+
+![Bulge (fisheye)](../img/examples/bulge.jpg)
+
+```bash
+gopxsort bulge -i city.jpg -o out.jpg --strength 0.6 --radius 0.5
+```
+
+```go
+out := effects.Bulge(img, 0.6, 0.5)
+```
+
+### Pinch
+
+![Pinch](../img/examples/bulge__pinch.jpg)
+
+```bash
+gopxsort bulge -i city.jpg -o out.jpg --strength -0.6 --radius 0.5
+```
+
+```go
+out := effects.Bulge(img, -0.6, 0.5)
+```
+
+### Polar coordinates
+
+![Polar coordinates](../img/examples/polar.jpg)
+
+```bash
+gopxsort polar -i city.jpg -o out.jpg
+```
+
+```go
+out := effects.Polar(img, false)
+```
+
+### Inverse polar coordinates
+
+![Inverse polar coordinates](../img/examples/polar__inverse.jpg)
+
+```bash
+gopxsort polar -i city.jpg -o out.jpg --inverse
+```
+
+```go
+out := effects.Polar(img, true)
+```
+
+### CRT curvature
+
+![CRT curvature](../img/examples/curvature.jpg)
+
+```bash
+gopxsort curvature -i city.jpg -o out.jpg --strength 0.12
+```
+
+```go
+out := effects.Curvature(img, 0.12)
+```
+
+### Slit-scan stretch
+
+![Slit-scan stretch](../img/examples/slitscan.jpg)
+
+```bash
+gopxsort slitscan -i city.jpg -o out.jpg --position 0.6
+```
+
+```go
+out := effects.SlitScan(img, 0.6, false)
+```
+
+### Vertical slit-scan stretch
+
+![Vertical slit-scan stretch](../img/examples/slitscan__vertical.jpg)
+
+```bash
+gopxsort slitscan -i city.jpg -o out.jpg --position 0.4 --vertical
+```
+
+```go
+out := effects.SlitScan(img, 0.4, true)
 ```
 
 ## Retro
@@ -1249,6 +1692,32 @@ gopxsort @oil -i city.jpg -o out.jpg
 
 ```go
 p, err := pipeline.ParseSeed("@oil", 7)
+out, err := p.Apply(img)
+```
+
+### @planet
+
+![@planet](../img/examples/preset_planet.jpg)
+
+```bash
+gopxsort @planet -i city.jpg -o out.jpg
+```
+
+```go
+p, err := pipeline.ParseSeed("@planet", 7)
+out, err := p.Apply(img)
+```
+
+### @databend
+
+![@databend](../img/examples/preset_databend.jpg)
+
+```bash
+gopxsort @databend -i city.jpg -o out.jpg
+```
+
+```go
+p, err := pipeline.ParseSeed("@databend", 7)
 out, err := p.Apply(img)
 ```
 

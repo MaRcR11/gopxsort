@@ -26,6 +26,10 @@ func paths() map[string]Path {
 		"concentric": Concentric(0.5, 0.5),
 		"corner":     Concentric(0, 1),
 		"radial":     Radial(0.3, 0.6),
+		"flow":       FlowField(10, 6, false, 3),
+		"flow-v":     FlowField(10, 6, true, 3),
+		"hilbert":    Hilbert(),
+		"spiral":     Spiral(0.5, 0.5, 3),
 	}
 	for _, a := range []float64{0, 10, 30, 45, 60, 89.9, 90, 135, 180, 225, 270, 333, -45} {
 		ps["linear"+strconv.FormatFloat(a, 'f', -1, 64)] = Linear(a)
@@ -229,5 +233,109 @@ func TestSpiralCoversEveryPixelOnce(t *testing.T) {
 				t.Fatalf("spacing %v: pixel %d visited %d times", spacing, i, n)
 			}
 		}
+	}
+}
+
+func TestImagePathsCoverEveryPixelOnce(t *testing.T) {
+	const w, h = 37, 23
+	img := randomImage(w, h, 9)
+	for _, vertical := range []bool{false, true} {
+		seen := make([]int, w*h)
+		for _, l := range Contour(8, 1, vertical).(ImagePath).LinesFor(img) {
+			for _, p := range l {
+				seen[p]++
+			}
+		}
+		for i, n := range seen {
+			if n != 1 {
+				t.Fatalf("vertical=%v: pixel %d visited %d times", vertical, i, n)
+			}
+		}
+	}
+}
+
+func TestHilbertIsConnected(t *testing.T) {
+	lines := Hilbert().Lines(32, 32)
+	if len(lines) != 1 || len(lines[0]) != 32*32 {
+		t.Fatalf("expected one line through all pixels")
+	}
+	l := lines[0]
+	for i := 1; i < len(l); i++ {
+		dx, dy := l[i]%32-l[i-1]%32, l[i]/32-l[i-1]/32
+		if dx*dx+dy*dy != 1 {
+			t.Fatalf("jump from %d to %d", l[i-1], l[i])
+		}
+	}
+}
+
+func TestModeChannels(t *testing.T) {
+	out := Sort(randomImage(40, 2, 10), Options{Interval: None(), Mode: ModeChannels})
+	for x := 1; x < 40; x++ {
+		a, b := out.NRGBAAt(x-1, 0), out.NRGBAAt(x, 0)
+		if a.R > b.R || a.G > b.G || a.B > b.B {
+			t.Fatalf("channels not sorted at x=%d", x)
+		}
+	}
+}
+
+func TestModeMirror(t *testing.T) {
+	out := Sort(randomImage(41, 1, 11), Options{Interval: None(), Mode: ModeMirror})
+	k := func(x int) float64 { return Lightness(out.NRGBAAt(x, 0)) }
+	for x := 1; x <= 20; x++ {
+		if k(x-1) > k(x) || k(40-x+1) > k(40-x) {
+			t.Fatalf("not rising towards the middle at %d", x)
+		}
+	}
+}
+
+func TestTileSort(t *testing.T) {
+	const size, tw, th = 4, 8, 3
+	img := image.NewNRGBA(image.Rect(0, 0, tw*size+2, th*size))
+	rng := rand.New(rand.NewSource(12))
+	for ty := 0; ty < th; ty++ {
+		for tx := 0; tx < tw; tx++ {
+			c := color.NRGBA{uint8(rng.Intn(256)), uint8(rng.Intn(256)), uint8(rng.Intn(256)), 255}
+			for y := 0; y < size; y++ {
+				for x := 0; x < size; x++ {
+					img.SetNRGBA(tx*size+x, ty*size+y, c)
+				}
+			}
+		}
+	}
+	out := Sort(img, Options{Interval: None(), Tile: size})
+	for ty := 0; ty < th; ty++ {
+		for tx := 0; tx < tw; tx++ {
+			c := out.NRGBAAt(tx*size, ty*size)
+			for y := 0; y < size; y++ {
+				for x := 0; x < size; x++ {
+					if out.NRGBAAt(tx*size+x, ty*size+y) != c {
+						t.Fatal("tile was split up")
+					}
+				}
+			}
+			if tx > 0 && Lightness(out.NRGBAAt((tx-1)*size, ty*size)) > Lightness(c) {
+				t.Fatalf("tiles in row %d are not sorted", ty)
+			}
+		}
+	}
+	if out.NRGBAAt(tw*size, 0) != img.NRGBAAt(tw*size, 0) {
+		t.Fatal("pixels outside full tiles changed")
+	}
+}
+
+func TestFromImage(t *testing.T) {
+	src := randomImage(40, 10, 13)
+	guide := image.NewGray(image.Rect(0, 0, 2, 1))
+	guide.Pix[1] = 255
+	out := Sort(src, Options{Interval: FromImage(guide, Threshold(0.5, 1))})
+	for y := 0; y < 10; y++ {
+		for x := 0; x < 20; x++ {
+			if out.NRGBAAt(x, y) != src.NRGBAAt(x, y) {
+				t.Fatalf("pixel (%d,%d) outside the guide's bright half moved", x, y)
+			}
+		}
+	}
+	if slices.Equal(out.Pix, src.Pix) {
+		t.Fatal("nothing was sorted")
 	}
 }

@@ -216,3 +216,42 @@ func SampleNearest(img image.Image, w, h int) func(x, y int) color.Color {
 		return img.At(b.Min.X+x*b.Dx()/w, b.Min.Y+y*b.Dy()/h)
 	}
 }
+
+func BlurFloat(v []float64, w, h, r int) []float64 {
+	if r <= 0 {
+		return v
+	}
+	tmp := make([]float64, len(v))
+	out := make([]float64, len(v))
+	n := float64(2*r + 1)
+	for y := 0; y < h; y++ {
+		for x := 0; x < w; x++ {
+			s := 0.0
+			for k := -r; k <= r; k++ {
+				s += v[y*w+Clamp(x+k, 0, w-1)]
+			}
+			tmp[y*w+x] = s / n
+		}
+	}
+	for y := 0; y < h; y++ {
+		for x := 0; x < w; x++ {
+			s := 0.0
+			for k := -r; k <= r; k++ {
+				s += tmp[Clamp(y+k, 0, h-1)*w+x]
+			}
+			out[y*w+x] = s / n
+		}
+	}
+	return out
+}
+
+func ResizeNearest(img image.Image, w, h int) *image.NRGBA {
+	at := SampleNearest(img, w, h)
+	dst := image.NewNRGBA(image.Rect(0, 0, w, h))
+	for y := 0; y < h; y++ {
+		for x := 0; x < w; x++ {
+			dst.Set(x, y, at(x, y))
+		}
+	}
+	return dst
+}

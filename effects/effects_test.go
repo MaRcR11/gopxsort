@@ -296,3 +296,60 @@ func TestMoreEffectsKeepSize(t *testing.T) {
 		}
 	}
 }
+
+func TestDistortionsWithZeroStrengthAreIdentity(t *testing.T) {
+	src := randomImage(31, 19)
+	cases := map[string]*image.NRGBA{
+		"displace":  Displace(src, nil, 0, 0),
+		"echo":      Echo(src, 0, image.Pt(5, 0), 0.5),
+		"bend":      DataBend(src, 100, 0),
+		"swirl":     Swirl(src, 0, 0.5),
+		"ripple":    Ripple(src, 0, 10),
+		"bulge":     Bulge(src, 0, 0.5),
+		"curvature": Curvature(src, 0),
+		"slitscan":  SlitScan(src, 1, false),
+		"interlace": Interlace(src, 0, 2, 0),
+	}
+	for name, out := range cases {
+		if !slices.Equal(out.Pix, src.Pix) {
+			t.Errorf("%s with zero strength changed the image", name)
+		}
+	}
+}
+
+func TestDistortionsKeepSize(t *testing.T) {
+	src := randomImage(33, 21)
+	outs := map[string]*image.NRGBA{
+		"displace":  Displace(src, Invert(src), 10, 5),
+		"echo":      Echo(src, 3, image.Pt(4, 2), 0.7),
+		"bend":      DataBend(src, 301, 0.5),
+		"swirl":     Swirl(src, 180, 0.5),
+		"ripple":    Ripple(src, 4, 8),
+		"bulge":     Bulge(src, -0.5, 0.5),
+		"polar":     Polar(src, false),
+		"unpolar":   Polar(src, true),
+		"curvature": Curvature(src, 0.2),
+		"slitscan":  SlitScan(src, 0.3, true),
+		"interlace": Interlace(src, 3, 3, 0.3),
+		"scatter":   Scatter(src, 3, 1),
+		"tracking":  Tracking(src, 3, 0.1, 0.3, 1),
+	}
+	for name, out := range outs {
+		if out.Bounds() != src.Bounds() {
+			t.Errorf("%s changed the bounds to %v", name, out.Bounds())
+		}
+	}
+}
+
+func TestSlitScanStretchesTheSlit(t *testing.T) {
+	src := randomImage(20, 5)
+	out := SlitScan(src, 0.5, false)
+	col := 9
+	for y := 0; y < 5; y++ {
+		for x := col; x < 20; x++ {
+			if out.NRGBAAt(x, y) != src.NRGBAAt(col, y) {
+				t.Fatalf("pixel (%d,%d) is not the slit color", x, y)
+			}
+		}
+	}
+}
