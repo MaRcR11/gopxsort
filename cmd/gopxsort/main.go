@@ -133,9 +133,18 @@ func parseOptions(args []string, spec *pipeline.Spec) (options, error) {
 		name, value, hasValue := strings.Cut(strings.TrimLeft(arg, "-"), "=")
 		isFlag := strings.HasPrefix(arg, "-") && !isNumber(arg)
 
+		opParam := false
+		if spec != nil && isFlag && strings.HasPrefix(arg, "--") && name != "seed" {
+			_, opParam = spec.Param(name)
+		}
+
 		switch {
 		case !isFlag:
 			o.rest = append(o.rest, arg)
+		case opParam:
+			var v string
+			v, err = paramValue(spec, name, value, hasValue, args, &i)
+			o.rest = append(o.rest, name+"="+v)
 		case name == "i" || name == "input":
 			o.input, err = valueOrNext(value, hasValue, next)
 		case name == "o" || name == "output":
@@ -163,23 +172,12 @@ func parseOptions(args []string, spec *pipeline.Spec) (options, error) {
 		case name == "quiet":
 			quiet = true
 		case spec != nil:
-			p, ok := spec.Param(name)
-			if !ok {
+			if _, ok := spec.Param(name); !ok {
 				return o, fmt.Errorf("%s: unknown option %s, run \"gopxsort help %s\"", spec.Name, arg, spec.Name)
 			}
-			switch {
-			case hasValue:
-			case p.Kind == pipeline.KindBool:
-				value = "true"
-				if i+1 < len(args) {
-					if _, perr := strconv.ParseBool(args[i+1]); perr == nil {
-						value, _ = next()
-					}
-				}
-			default:
-				value, err = next()
-			}
-			o.rest = append(o.rest, name+"="+value)
+			var v string
+			v, err = paramValue(spec, name, value, hasValue, args, &i)
+			o.rest = append(o.rest, name+"="+v)
 		default:
 			return o, fmt.Errorf("unknown option %s", arg)
 		}
@@ -188,6 +186,27 @@ func parseOptions(args []string, spec *pipeline.Spec) (options, error) {
 		}
 	}
 	return o, nil
+}
+
+func paramValue(spec *pipeline.Spec, name, value string, hasValue bool, args []string, i *int) (string, error) {
+	if hasValue {
+		return value, nil
+	}
+	p, _ := spec.Param(name)
+	if p.Kind == pipeline.KindBool {
+		if *i+1 < len(args) {
+			if _, err := strconv.ParseBool(args[*i+1]); err == nil {
+				*i++
+				return args[*i], nil
+			}
+		}
+		return "true", nil
+	}
+	if *i+1 >= len(args) {
+		return "", fmt.Errorf("--%s needs a value", name)
+	}
+	*i++
+	return args[*i], nil
 }
 
 func valueOrNext(value string, hasValue bool, next func() (string, error)) (string, error) {

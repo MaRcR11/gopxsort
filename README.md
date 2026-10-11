@@ -6,9 +6,9 @@ Pixel sorting and glitch art for Go: a command line tool and a library.
 [![CI](https://github.com/MaRcR11/gopxsort/actions/workflows/ci.yml/badge.svg)](https://github.com/MaRcR11/gopxsort/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
-Original | Sorted along edges, by hue | Spiral sort | Animated threshold sweep
--------- | -------------------------- | ----------- | ------------------------
-![Original](img/train/train.jpg) | ![](img/examples/sort_hue.jpg) | ![](img/examples/sort_spiral.jpg) | ![](img/examples/animation.gif)
+Original | Sorted by hue between edges | Spiral sort | Animated sweep
+-------- | ----------------------------- | ----------- | --------------
+![Original](img/city/city.jpg) | ![](img/examples/sort_hue_edges.jpg) | ![](img/examples/sort_path_spiral.jpg) | ![](img/examples/anim_threshold.gif)
 
 - **Pixel sorting**, modelled on the usual tools (satyarth/pixelsort, ASDF, Acerola):
   - 13 sort keys: lightness, luminance, hue, saturation, value, chroma, single channels, and more.
@@ -224,17 +224,17 @@ _ = imageio.SaveAnimation("out.gif", out)
 
 ## Gallery
 
-Every image below is made from [img/train/train.jpg](img/train/train.jpg) with `--seed 7`.
+All examples start from [img/city/city.jpg](img/city/city.jpg).
+**[docs/EXAMPLES.md](docs/EXAMPLES.md)** has 98 examples covering every sort option, operation, preset and animation, each with the full command and the equivalent Go library code.
 
 | | | |
 |-|-|-|
-| ![](img/examples/sort_angle.jpg) `sort angle=90 lower=0.3 upper=0.9` | ![](img/examples/sort_diagonal.jpg) `sort angle=135 interval=waves length=80 lower=0` | ![](img/examples/sort_smear.jpg) `sort mode=smear interval=edges edge=0.12 angle=270` |
-| ![](img/examples/sort_random.jpg) `sort interval=random length=120 angle=270 reverse` | ![](img/examples/sort_concentric.jpg) `sort path=concentric lower=0.2` | ![](img/examples/sort_radial.jpg) `sort path=radial interval=edges edge=0.15` |
-| ![](img/examples/preset_glitch.jpg) `@glitch` | ![](img/examples/preset_vaporwave.jpg) `@vaporwave` | ![](img/examples/preset_crt.jpg) `@crt` |
-| ![](img/examples/preset_chunky.jpg) `@chunky` | ![](img/examples/kaleidoscope.jpg) `kaleidoscope segments=6` | ![](img/examples/halftone.jpg) `halftone size=8 color` |
-| ![](img/examples/glitch.jpg) `glitch slices=25 shift=0.15 \| shift r=10,0 b=-10,0 \| scanlines` | ![](img/examples/jpeg.jpg) `jpeg amount=40 quality=40` | ![](img/examples/melt.jpg) `melt shift=150` |
-| ![](img/examples/dither.jpg) `dither atkinson palette=gameboy` | ![](img/examples/gradientmap.jpg) `gradientmap colors=#120458,#ff2a6d,#ffd319 \| pixelate 4` | ![](img/examples/mirror.jpg) `mirror quad \| aberration strength=0.02 \| vignette 0.6` |
-| ![](img/examples/combo.jpg) `sort key=saturation angle=45 lower=0.35 \| glitch slices=10 \| dither bayer4 palette=pico8` | ![](img/examples/quantize.jpg) `quantize colors=8 method=floyd \| oilpaint radius=3` | ![](img/examples/sort_wave.jpg) `sort path=wave amplitude=30 wavelength=250 lower=0.2` |
+| ![](img/examples/sort_vertical.jpg)<br>`sort --angle 270 --lower 0.1 --upper 0.9` | ![](img/examples/sort_random_vertical.jpg)<br>`sort --interval random --length 100 --angle 270 --reverse` | ![](img/examples/sort_mode_smear.jpg)<br>`sort --mode smear --interval edges --edge 0.12 --angle 270` |
+| ![](img/examples/sort_path_concentric.jpg)<br>`sort --path concentric --lower 0.1` | ![](img/examples/sort_path_wave.jpg)<br>`sort --path wave --amplitude 40 --wavelength 300 --lower 0.1` | ![](img/examples/sort_mode_gradient.jpg)<br>`sort --mode gradient --interval random --length 60 --angle 90` |
+| ![](img/examples/glitch.jpg)<br>`glitch --slices 30 --shift 0.15` | ![](img/examples/jpeg.jpg)<br>`jpeg --amount 15 --quality 40 --seed 2` | ![](img/examples/melt.jpg)<br>`melt --shift 150` |
+| ![](img/examples/dither.jpg)<br>`dither --method atkinson --palette gameboy` | ![](img/examples/kaleidoscope.jpg)<br>`kaleidoscope --segments 6` | ![](img/examples/halftone.jpg)<br>`halftone --size 8 --color` |
+| ![](img/examples/preset_vaporwave.jpg)<br>`@vaporwave` | ![](img/examples/preset_crt.jpg)<br>`@crt` | ![](img/examples/preset_glitch.jpg)<br>`@glitch` |
+| ![](img/examples/pipeline_blocky.jpg)<br>`run "resize scale=0.2 \| sort angle=90 lower=0.1 \| resize original filter=nearest \| aberration"` | ![](img/examples/preset_chunky.jpg)<br>`@chunky` | ![](img/examples/anim_kaleidoscope.gif)<br>`run --frames 16 --pingpong "resize width=480 \| kaleidoscope rotation={0..60}"` |
 
 ## Project structure
 
@@ -247,7 +247,8 @@ gopxsort/
 ├── imageio/             load and save images and animated GIFs
 ├── internal/imgutil/    shared low-level helpers (not public API)
 ├── cmd/gopxsort/        the command line tool
-└── img/                 sample images and gallery
+├── docs/EXAMPLES.md     every example with CLI command and library code
+└── img/                 sample image and gallery
 ```
 
 ## Development

@@ -203,7 +203,7 @@ func Melt(img image.Image, maxShift int, seed int64) *image.NRGBA {
 
 func JPEGCorrupt(img image.Image, amount, quality int, seed int64) (*image.NRGBA, error) {
 	var buf bytes.Buffer
-	if err := jpeg.Encode(&buf, img, &jpeg.Options{Quality: imgutil.Clamp(quality, 1, 100)}); err != nil {
+	if err := jpeg.Encode(&buf, imgutil.ToNRGBA(img), &jpeg.Options{Quality: imgutil.Clamp(quality, 1, 100)}); err != nil {
 		return nil, err
 	}
 	data := buf.Bytes()
