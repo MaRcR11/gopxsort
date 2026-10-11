@@ -1,0 +1,9 @@
+# Binaries
+/gopxsort
+*.exe
+dist/
+
+# Test and profiling output
+*.test
+*.out
+coverage.*
