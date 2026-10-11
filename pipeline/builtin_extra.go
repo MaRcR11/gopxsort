@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"image"
 
-	"github.com/MaRcR11/gopxsort/effects"
+	"github.com/MaRcR11/sortcery/effects"
 )
 
 func registerExtra() {

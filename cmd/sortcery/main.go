@@ -10,8 +10,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/MaRcR11/gopxsort/imageio"
-	"github.com/MaRcR11/gopxsort/pipeline"
+	"github.com/MaRcR11/sortcery/imageio"
+	"github.com/MaRcR11/sortcery/pipeline"
 )
 
 var version = "dev"
@@ -69,7 +69,7 @@ func run(args []string, stdout io.Writer) error {
 		printPresets(stdout)
 		return nil
 	case "version", "--version":
-		fmt.Fprintln(stdout, "gopxsort", version)
+		fmt.Fprintln(stdout, "sortcery", version)
 		return nil
 	case "run":
 		o, err := parseOptions(args[1:], nil)
@@ -91,7 +91,7 @@ func run(args []string, stdout io.Writer) error {
 		}
 		spec, ok := pipeline.Lookup(cmd)
 		if !ok {
-			return fmt.Errorf("unknown command %q, run \"gopxsort help\" for usage", cmd)
+			return fmt.Errorf("unknown command %q, run \"sortcery help\" for usage", cmd)
 		}
 		o, err := parseOptions(args[1:], spec)
 		if err != nil {
@@ -173,7 +173,7 @@ func parseOptions(args []string, spec *pipeline.Spec) (options, error) {
 			quiet = true
 		case spec != nil:
 			if _, ok := spec.Param(name); !ok {
-				return o, fmt.Errorf("%s: unknown option %s, run \"gopxsort help %s\"", spec.Name, arg, spec.Name)
+				return o, fmt.Errorf("%s: unknown option %s, run \"sortcery help %s\"", spec.Name, arg, spec.Name)
 			}
 			var v string
 			v, err = paramValue(spec, name, value, hasValue, args, &i)
@@ -258,7 +258,7 @@ func process(o options, ops string) error {
 		return errors.New("input (-i) and output (-o) are required")
 	}
 	if strings.TrimSpace(ops) == "" {
-		return errors.New("no operations given, e.g. gopxsort run -i in.jpg -o out.png \"sort angle=90 | glitch\"")
+		return errors.New("no operations given, e.g. sortcery run -i in.jpg -o out.png \"sort angle=90 | glitch\"")
 	}
 	if o.format != "" {
 		f, err := imageio.ParseFormat(o.format)

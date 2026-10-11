@@ -1,4 +1,4 @@
-module github.com/MaRcR11/gopxsort/site
+module github.com/MaRcR11/sortcery/site
 
 go 1.21
 

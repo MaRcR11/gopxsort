@@ -1,15 +1,15 @@
-package gopxsort_test
+package sortcery_test
 
 import (
 	"image"
 	"image/color"
 	"log"
 
-	"github.com/MaRcR11/gopxsort"
-	"github.com/MaRcR11/gopxsort/effects"
-	"github.com/MaRcR11/gopxsort/imageio"
-	"github.com/MaRcR11/gopxsort/pipeline"
-	"github.com/MaRcR11/gopxsort/sorter"
+	"github.com/MaRcR11/sortcery"
+	"github.com/MaRcR11/sortcery/effects"
+	"github.com/MaRcR11/sortcery/imageio"
+	"github.com/MaRcR11/sortcery/pipeline"
+	"github.com/MaRcR11/sortcery/sorter"
 )
 
 func Example_sort() {
@@ -64,7 +64,7 @@ func Example_pipeline() {
 }
 
 func Example_applyFile() {
-	err := gopxsort.ApplyFile("img/city/city.jpg", "out.jpg", "sort angle=45 | vignette")
+	err := sortcery.ApplyFile("img/city/city.jpg", "out.jpg", "sort angle=45 | vignette")
 	if err != nil {
 		log.Fatal(err)
 	}

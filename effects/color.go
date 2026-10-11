@@ -7,7 +7,7 @@ import (
 	"math"
 	"strings"
 
-	"github.com/MaRcR11/gopxsort/internal/imgutil"
+	"github.com/MaRcR11/sortcery/internal/imgutil"
 )
 
 func Map(img image.Image, fn func(c color.NRGBA) color.NRGBA) *image.NRGBA {

@@ -7,9 +7,9 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/MaRcR11/gopxsort/effects"
-	"github.com/MaRcR11/gopxsort/imageio"
-	"github.com/MaRcR11/gopxsort/sorter"
+	"github.com/MaRcR11/sortcery/effects"
+	"github.com/MaRcR11/sortcery/imageio"
+	"github.com/MaRcR11/sortcery/sorter"
 )
 
 func str(name, def, help string, choices ...string) Param {

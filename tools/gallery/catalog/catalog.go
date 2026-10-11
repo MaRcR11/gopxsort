@@ -132,7 +132,7 @@ var Sections = []Section{
 			"Interval: sorter.None()"),
 		srt("sort_all_vertical", "Every pixel, whole columns", "--interval none --angle 270",
 			"Interval: sorter.None()", "Path: sorter.Linear(270)"),
-		srt("sort_classic", "Classic luminance sort (like the original gopxsort)", "--interval none --key luminance",
+		srt("sort_classic", "Classic luminance sort (the algorithm of the very first version)", "--interval none --key luminance",
 			"Key: sorter.Luminance", "Interval: sorter.None()"),
 		srt("sort_reverse", "Reversed (bright to dark)", "--lower 0.2 --reverse",
 			"Interval: sorter.Threshold(0.2, 0.8)", "Reverse: true"),

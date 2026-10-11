@@ -8,7 +8,7 @@ import (
 	"math"
 	"math/rand"
 
-	"github.com/MaRcR11/gopxsort/internal/imgutil"
+	"github.com/MaRcR11/sortcery/internal/imgutil"
 )
 
 func ChannelShift(img image.Image, r, g, b image.Point) *image.NRGBA {

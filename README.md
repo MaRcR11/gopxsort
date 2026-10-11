@@ -1,13 +1,13 @@
-# gopxsort
+# sortcery
 
-Pixel sorting and glitch art for Go: a command line tool and a library.
+Pixel sorting and glitch magic for Go: a command line tool and a library. *Formerly gopxsort.*
 
-**[Documentation and gallery →](https://marcr11.github.io/gopxsort/)**
+**[Documentation and gallery →](https://marcr11.github.io/sortcery/)**
 
-[![Go Reference](https://pkg.go.dev/badge/github.com/MaRcR11/gopxsort.svg)](https://pkg.go.dev/github.com/MaRcR11/gopxsort)
-[![CI](https://github.com/MaRcR11/gopxsort/actions/workflows/ci.yml/badge.svg)](https://github.com/MaRcR11/gopxsort/actions/workflows/ci.yml)
+[![Go Reference](https://pkg.go.dev/badge/github.com/MaRcR11/sortcery.svg)](https://pkg.go.dev/github.com/MaRcR11/sortcery)
+[![CI](https://github.com/MaRcR11/sortcery/actions/workflows/ci.yml/badge.svg)](https://github.com/MaRcR11/sortcery/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-[![Docs](https://img.shields.io/badge/docs-gallery-blue)](https://marcr11.github.io/gopxsort/)
+[![Docs](https://img.shields.io/badge/docs-gallery-blue)](https://marcr11.github.io/sortcery/)
 
 Original | Sorted by hue between edges | Spiral sort | Animated sweep
 -------- | ----------------------------- | ----------- | --------------
@@ -40,30 +40,30 @@ Original | Sorted by hue between edges | Spiral sort | Animated sweep
 
 ## Installation
 
-Precompiled binaries for Windows, Linux and macOS are on the [releases](https://github.com/MaRcR11/gopxsort/releases) page.
+Precompiled binaries for Windows, Linux and macOS are on the [releases](https://github.com/MaRcR11/sortcery/releases) page.
 With Go 1.21 or newer:
 
 ```bash
-go install github.com/MaRcR11/gopxsort/cmd/gopxsort@latest
+go install github.com/MaRcR11/sortcery/cmd/sortcery@latest
 ```
 
 Use it as a library:
 
 ```bash
-go get github.com/MaRcR11/gopxsort
+go get github.com/MaRcR11/sortcery
 ```
 
 ## Command line
 
 ```text
-gopxsort <operation> -i <input> -o <output> [--param value | param=value ...]
-gopxsort run -i <input> -o <output> "<op> [params] | <op> [params] | ..."
-gopxsort @<preset> -i <input> -o <output>
-gopxsort -i <input> -o <output> [-t <0-255>]      (classic threshold sort)
+sortcery <operation> -i <input> -o <output> [--param value | param=value ...]
+sortcery run -i <input> -o <output> "<op> [params] | <op> [params] | ..."
+sortcery @<preset> -i <input> -o <output>
+sortcery -i <input> -o <output> [-t <0-255>]      (classic threshold sort)
 
-gopxsort list          list all operations
-gopxsort presets       list all presets
-gopxsort help <op>     show the parameters of an operation
+sortcery list          list all operations
+sortcery presets       list all presets
+sortcery help <op>     show the parameters of an operation
 ```
 
 | Option | Description |
@@ -79,15 +79,15 @@ gopxsort help <op>     show the parameters of an operation
 | `--quiet`       | no progress output |
 | `-t, --threshold` | classic mode: sort pixels with luminance ≥ t (0–255) |
 
-You can write parameters as `--name value`, as `name=value`, or positionally in the order that `gopxsort help <op>` lists them:
+You can write parameters as `--name value`, as `name=value`, or positionally in the order that `sortcery help <op>` lists them:
 
 ```bash
-gopxsort sort -i in.jpg -o out.png --angle 90 --key hue
-gopxsort sort -i in.jpg -o out.png interval=edges edge=0.2 reverse
-gopxsort pixelate -i in.jpg -o out.png 12
-gopxsort run -i in.jpg -o out.png "sort angle=45 lower=0.4 | shift | scanlines"
-gopxsort @vhs -i in.jpg -o out.png
-gopxsort run -i in.jpg -o out.png "@chunky | @crt"
+sortcery sort -i in.jpg -o out.png --angle 90 --key hue
+sortcery sort -i in.jpg -o out.png interval=edges edge=0.2 reverse
+sortcery pixelate -i in.jpg -o out.png 12
+sortcery run -i in.jpg -o out.png "sort angle=45 lower=0.4 | shift | scanlines"
+sortcery @vhs -i in.jpg -o out.png
+sortcery run -i in.jpg -o out.png "@chunky | @crt"
 ```
 
 ### Animation
@@ -95,24 +95,24 @@ gopxsort run -i in.jpg -o out.png "@chunky | @crt"
 Write `{from..to}` in any parameter to sweep it across the frames:
 
 ```bash
-gopxsort run -i in.jpg -o anim.gif --frames 30 --pingpong "sort angle={0..90} lower={0.05..0.5}"
-gopxsort run -i in.jpg -o frames/f%03d.png --frames 60 "glitch seed={1..60}"
-gopxsort run -i animated.gif -o sorted.gif "sort angle=90"
+sortcery run -i in.jpg -o anim.gif --frames 30 --pingpong "sort angle={0..90} lower={0.05..0.5}"
+sortcery run -i in.jpg -o frames/f%03d.png --frames 60 "glitch seed={1..60}"
+sortcery run -i animated.gif -o sorted.gif "sort angle=90"
 ```
 
 ### Batch and pipes
 
 ```bash
-gopxsort run -i "photos/*.jpg" -o sorted/ "sort angle=90"
-gopxsort @vaporwave -i photos/ -o out/ --format png
-cat in.png | gopxsort @crt -i - -o - > out.png
+sortcery run -i "photos/*.jpg" -o sorted/ "sort angle=90"
+sortcery @vaporwave -i photos/ -o out/ --format png
+cat in.png | sortcery @crt -i - -o - > out.png
 ```
 
-The original interface still works: `gopxsort -i img/city/city.jpg -o out.jpg -t 128`.
+The original interface still works: `sortcery -i img/city/city.jpg -o out.jpg -t 128`.
 
 ### Sorting
 
-`gopxsort help sort` lists all parameters. The main ones:
+`sortcery help sort` lists all parameters. The main ones:
 
 | Parameter | Values | Default | |
 | --------- | ------ | ------- | - |
@@ -172,16 +172,16 @@ The original interface still works: `gopxsort -i img/city/city.jpg -o out.jpg -t
 | `@planet` | `polar \| vignette 0.4` |
 | `@databend` | `bend delay=12347 feedback=0.6 \| interlace shift=6` |
 
-`gopxsort presets` prints the full pipelines.
+`sortcery presets` prints the full pipelines.
 
 ## Library
 
 ```go
 import (
-	"github.com/MaRcR11/gopxsort/effects"
-	"github.com/MaRcR11/gopxsort/imageio"
-	"github.com/MaRcR11/gopxsort/pipeline"
-	"github.com/MaRcR11/gopxsort/sorter"
+	"github.com/MaRcR11/sortcery/effects"
+	"github.com/MaRcR11/sortcery/imageio"
+	"github.com/MaRcR11/sortcery/pipeline"
+	"github.com/MaRcR11/sortcery/sorter"
 )
 
 img, _ := imageio.Load("in.jpg")
@@ -213,7 +213,7 @@ p, err := pipeline.ParseSeed("@chunky | glitch slices=20 | mix 0.7", 42)
 out, err := p.Apply(img)
 
 // shortest form
-err = gopxsort.ApplyFile("in.jpg", "out.png", "sort angle=45 | vignette")
+err = sortcery.ApplyFile("in.jpg", "out.png", "sort angle=45 | vignette")
 ```
 
 Animations:
@@ -237,7 +237,7 @@ _ = imageio.SaveAnimation("out.gif", out)
 
 ## Gallery
 
-**[See the full gallery on the docs site →](https://marcr11.github.io/gopxsort/docs/gallery/)** It has 132 examples covering every sort option, operation, preset and animation, each with the command and the equivalent Go code.
+**[See the full gallery on the docs site →](https://marcr11.github.io/sortcery/docs/gallery/)** It has 132 examples covering every sort option, operation, preset and animation, each with the command and the equivalent Go code.
 
 All examples start from [img/city/city.jpg](img/city/city.jpg).
 
@@ -250,14 +250,14 @@ All examples start from [img/city/city.jpg](img/city/city.jpg).
 ## Project structure
 
 ```text
-gopxsort/
-├── gopxsort.go          shortcuts: Sort, Apply, ApplyFile
+sortcery/
+├── sortcery.go          shortcuts: Sort, Apply, ApplyFile
 ├── sorter/              pixel sorting engine: keys, intervals, paths, modes
 ├── effects/             color, glitch, distortion, dithering, artistic and geometry effects
 ├── pipeline/            operation registry, "op | op" parser, presets, animation
 ├── imageio/             load and save images and animated GIFs
 ├── internal/imgutil/    shared low-level helpers (not public API)
-├── cmd/gopxsort/        the command line tool
+├── cmd/sortcery/        the command line tool
 ├── tools/gallery/       generates the docs gallery and checks CLI against library output
 ├── site/                the documentation site (Hugo + Hextra)
 └── img/                 sample image and README highlights (not part of the Go module)
@@ -280,7 +280,7 @@ The gallery, the operations reference and their images are generated, not commit
 ```bash
 go run ./tools/gallery/gensnippets   # after changing tools/gallery/catalog: regenerate the Go snippets
 go run ./tools/gallery               # render all examples, check CLI == library, write them into site/
-hugo server --source site            # preview at http://localhost:1313/gopxsort/
+hugo server --source site            # preview at http://localhost:1313/sortcery/
 go run ./tools/gallery -site "" -readme img/examples   # refresh the README highlight images
 ```
 
