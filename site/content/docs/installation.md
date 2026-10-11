@@ -10,18 +10,18 @@ weight: 1
 With Go 1.21 or newer:
 
 ```bash
-go install github.com/MaRcR11/gopxsort/cmd/gopxsort@latest
+go install github.com/MaRcR11/sortcery/cmd/sortcery@latest
 ```
 {{< /tab >}}
 {{< tab name="Binary" >}}
 Download a precompiled binary for Windows, Linux or macOS from the
-[releases page](https://github.com/MaRcR11/gopxsort/releases), unpack it and put `gopxsort` on your `PATH`.
+[releases page](https://github.com/MaRcR11/sortcery/releases), unpack it and put `sortcery` on your `PATH`.
 {{< /tab >}}
 {{< tab name="From source" >}}
 ```bash
-git clone https://github.com/MaRcR11/gopxsort.git
-cd gopxsort
-go build -o gopxsort ./cmd/gopxsort
+git clone https://github.com/MaRcR11/sortcery.git
+cd sortcery
+go build -o sortcery ./cmd/sortcery
 ```
 {{< /tab >}}
 {{< /tabs >}}
@@ -29,14 +29,14 @@ go build -o gopxsort ./cmd/gopxsort
 Check that it works:
 
 ```bash
-gopxsort version
-gopxsort list
+sortcery version
+sortcery list
 ```
 
 ## Library
 
 ```bash
-go get github.com/MaRcR11/gopxsort
+go get github.com/MaRcR11/sortcery
 ```
 
 The library only depends on the Go standard library and `golang.org/x/image`.

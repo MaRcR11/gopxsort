@@ -1,3 +1,3 @@
-module github.com/MaRcR11/gopxsort/img
+module github.com/MaRcR11/sortcery/img
 
 go 1.21

@@ -4,16 +4,16 @@ weight: 4
 ---
 
 ```bash
-go get github.com/MaRcR11/gopxsort
+go get github.com/MaRcR11/sortcery
 ```
 
 | Package | |
 | ------- | - |
-| [`sorter`](https://pkg.go.dev/github.com/MaRcR11/gopxsort/sorter) | the pixel sorting engine: keys, intervals, paths, modes |
-| [`effects`](https://pkg.go.dev/github.com/MaRcR11/gopxsort/effects) | color, glitch, distortion, dithering, artistic and geometry effects |
-| [`pipeline`](https://pkg.go.dev/github.com/MaRcR11/gopxsort/pipeline) | operation registry, the `op \| op` parser, presets and animation |
-| [`imageio`](https://pkg.go.dev/github.com/MaRcR11/gopxsort/imageio) | load and save images and animated GIFs |
-| [`gopxsort`](https://pkg.go.dev/github.com/MaRcR11/gopxsort) | shortcuts: `Sort`, `Apply`, `ApplyFile` |
+| [`sorter`](https://pkg.go.dev/github.com/MaRcR11/sortcery/sorter) | the pixel sorting engine: keys, intervals, paths, modes |
+| [`effects`](https://pkg.go.dev/github.com/MaRcR11/sortcery/effects) | color, glitch, distortion, dithering, artistic and geometry effects |
+| [`pipeline`](https://pkg.go.dev/github.com/MaRcR11/sortcery/pipeline) | operation registry, the `op \| op` parser, presets and animation |
+| [`imageio`](https://pkg.go.dev/github.com/MaRcR11/sortcery/imageio) | load and save images and animated GIFs |
+| [`sortcery`](https://pkg.go.dev/github.com/MaRcR11/sortcery) | shortcuts: `Sort`, `Apply`, `ApplyFile` |
 
 Every example in the [gallery](../gallery) shows the matching Go code next to the command line call.
 
@@ -60,7 +60,7 @@ out, err := p.Apply(img)
 Or in one line, file in and file out:
 
 ```go
-err := gopxsort.ApplyFile("in.jpg", "out.png", "sort angle=45 | vignette")
+err := sortcery.ApplyFile("in.jpg", "out.png", "sort angle=45 | vignette")
 ```
 
 ## Animation

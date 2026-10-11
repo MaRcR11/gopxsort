@@ -6,7 +6,7 @@ import (
 	"math"
 	"math/rand"
 
-	"github.com/MaRcR11/gopxsort/internal/imgutil"
+	"github.com/MaRcR11/sortcery/internal/imgutil"
 )
 
 func Halftone(img image.Image, size int, colored bool) *image.NRGBA {

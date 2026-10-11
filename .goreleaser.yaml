@@ -1,7 +1,7 @@
 version: 2
 
 builds:
-  - main: ./cmd/gopxsort
+  - main: ./cmd/sortcery
     env:
       - CGO_ENABLED=0
     goos: [linux, windows, darwin]

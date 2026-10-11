@@ -14,11 +14,11 @@ import (
 	"strings"
 	"time"
 
-	"github.com/MaRcR11/gopxsort/effects"
-	"github.com/MaRcR11/gopxsort/imageio"
-	"github.com/MaRcR11/gopxsort/pipeline"
-	"github.com/MaRcR11/gopxsort/tools/gallery/catalog"
-	"github.com/MaRcR11/gopxsort/tools/gallery/snippets"
+	"github.com/MaRcR11/sortcery/effects"
+	"github.com/MaRcR11/sortcery/imageio"
+	"github.com/MaRcR11/sortcery/pipeline"
+	"github.com/MaRcR11/sortcery/tools/gallery/catalog"
+	"github.com/MaRcR11/sortcery/tools/gallery/snippets"
 )
 
 const source = "img/city/city.jpg"
@@ -43,20 +43,20 @@ func main() {
 	}
 	*site, *readme = abs(*site), abs(*readme)
 
-	work, err := os.MkdirTemp("", "gopxsort-gallery-")
+	work, err := os.MkdirTemp("", "sortcery-gallery-")
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer os.RemoveAll(work)
 
-	bin := filepath.Join(work, "gopxsort")
+	bin := filepath.Join(work, "sortcery")
 	if runtime.GOOS == "windows" {
 		bin += ".exe"
 	}
-	build := exec.Command("go", "build", "-o", bin, "./cmd/gopxsort")
+	build := exec.Command("go", "build", "-o", bin, "./cmd/sortcery")
 	build.Stdout, build.Stderr = os.Stdout, os.Stderr
 	if err := build.Run(); err != nil {
-		log.Fatalf("build gopxsort: %v", err)
+		log.Fatalf("build sortcery: %v", err)
 	}
 	data, err := os.ReadFile(filepath.Join(root, source))
 	if err != nil {
@@ -298,7 +298,7 @@ func sectionPage(s catalog.Section, weight int) string {
 	for _, e := range s.Examples {
 		fmt.Fprintf(&b, "## %s {#%s}\n\n![%s](/gallery/%s)\n\n", e.Title, e.Name, e.Title, e.File())
 		b.WriteString("{{< tabs >}}\n")
-		fmt.Fprintf(&b, "{{< tab name=\"CLI\" >}}\n```bash\ngopxsort %s\n```\n{{< /tab >}}\n", e.CLI)
+		fmt.Fprintf(&b, "{{< tab name=\"CLI\" >}}\n```bash\nsortcery %s\n```\n{{< /tab >}}\n", e.CLI)
 		fmt.Fprintf(&b, "{{< tab name=\"Go\" >}}\n```go\n%s\n```\n{{< /tab >}}\n", e.Code)
 		b.WriteString("{{< /tabs >}}\n\n")
 	}
@@ -324,7 +324,7 @@ func referencePage() string {
 	var b strings.Builder
 	b.WriteString("---\ntitle: Operations reference\nweight: 5\n---\n\n")
 	fmt.Fprintf(&b, "All %d operations with their parameters. This page is generated from the code, so it always matches the current version. "+
-		"Run `gopxsort help <operation>` for the same information in the terminal.\n\n", len(pipeline.Specs()))
+		"Run `sortcery help <operation>` for the same information in the terminal.\n\n", len(pipeline.Specs()))
 	for _, s := range pipeline.Specs() {
 		fmt.Fprintf(&b, "## %s {#%s}\n\n%s\n\n", s.Name, s.Name, s.Help)
 		if sec, e, ok := exampleFor(s.Name); ok {

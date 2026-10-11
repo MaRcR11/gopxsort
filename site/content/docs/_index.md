@@ -3,7 +3,7 @@ title: Introduction
 weight: 1
 ---
 
-gopxsort is a pixel sorting and glitch art toolkit for Go. You can use it as a command line tool or import it as a library.
+sortcery is a pixel sorting and glitch art toolkit for Go. You can use it as a command line tool or import it as a library.
 
 ![Sorted by hue between edges](/gallery/sort_hue_edges.jpg)
 
@@ -12,20 +12,20 @@ gopxsort is a pixel sorting and glitch art toolkit for Go. You can use it as a c
 Install the command line tool:
 
 ```bash
-go install github.com/MaRcR11/gopxsort/cmd/gopxsort@latest
+go install github.com/MaRcR11/sortcery/cmd/sortcery@latest
 ```
 
 Sort an image from top to bottom by hue:
 
 ```bash
-gopxsort sort -i photo.jpg -o sorted.png --angle 270 --key hue
+sortcery sort -i photo.jpg -o sorted.png --angle 270 --key hue
 ```
 
 Chain several operations, or use a preset:
 
 ```bash
-gopxsort run -i photo.jpg -o out.png "sort angle=45 lower=0.4 | shift | scanlines"
-gopxsort @vaporwave -i photo.jpg -o out.png
+sortcery run -i photo.jpg -o out.png "sort angle=45 lower=0.4 | shift | scanlines"
+sortcery @vaporwave -i photo.jpg -o out.png
 ```
 
 Or use it from Go:

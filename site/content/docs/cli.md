@@ -4,15 +4,15 @@ weight: 2
 ---
 
 ```text
-gopxsort <operation> -i <input> -o <output> [--param value | param=value ...]
-gopxsort run -i <input> -o <output> "<op> [params] | <op> [params] | ..."
-gopxsort @<preset> -i <input> -o <output>
-gopxsort -i <input> -o <output> [-t <0-255>]      (classic threshold sort)
+sortcery <operation> -i <input> -o <output> [--param value | param=value ...]
+sortcery run -i <input> -o <output> "<op> [params] | <op> [params] | ..."
+sortcery @<preset> -i <input> -o <output>
+sortcery -i <input> -o <output> [-t <0-255>]      (classic threshold sort)
 
-gopxsort list          list all operations
-gopxsort presets       list all presets
-gopxsort help <op>     show the parameters of an operation
-gopxsort version       print the version
+sortcery list          list all operations
+sortcery presets       list all presets
+sortcery help <op>     show the parameters of an operation
+sortcery version       print the version
 ```
 
 ## Options
@@ -35,12 +35,12 @@ gopxsort version       print the version
 Parameters of an operation can be written in three ways:
 
 ```bash
-gopxsort sort -i in.jpg -o out.png --angle 90 --key hue
-gopxsort sort -i in.jpg -o out.png angle=90 key=hue
-gopxsort pixelate -i in.jpg -o out.png 12
+sortcery sort -i in.jpg -o out.png --angle 90 --key hue
+sortcery sort -i in.jpg -o out.png angle=90 key=hue
+sortcery pixelate -i in.jpg -o out.png 12
 ```
 
-The last form uses positional values in the order `gopxsort help <op>` lists them. Flags without a value such as `--reverse` switch a boolean parameter on.
+The last form uses positional values in the order `sortcery help <op>` lists them. Flags without a value such as `--reverse` switch a boolean parameter on.
 When an operation has a parameter with the same name as a global option, for example `jpeg --quality`, the operation's parameter wins. The short `-q` always sets the output quality.
 
 The [operations reference](../reference) lists every parameter.
@@ -50,7 +50,7 @@ The [operations reference](../reference) lists every parameter.
 `run` chains operations with `|`. Each stage works on the result of the previous one:
 
 ```bash
-gopxsort run -i in.jpg -o out.png "sort angle=270 interval=edges edge=0.15 | shift | scanlines"
+sortcery run -i in.jpg -o out.png "sort angle=270 interval=edges edge=0.15 | shift | scanlines"
 ```
 
 Two operations are special inside pipelines:
@@ -63,33 +63,33 @@ Two operations are special inside pipelines:
 Presets are ready-made pipelines. Run one directly, or use it as a stage:
 
 ```bash
-gopxsort @vhs -i in.jpg -o out.png
-gopxsort run -i in.jpg -o out.png "@chunky | @crt"
+sortcery @vhs -i in.jpg -o out.png
+sortcery run -i in.jpg -o out.png "@chunky | @crt"
 ```
 
-`gopxsort presets` prints all of them; the [reference](../reference#presets) and the [gallery](../gallery/presets) show what they do.
+`sortcery presets` prints all of them; the [reference](../reference#presets) and the [gallery](../gallery/presets) show what they do.
 
 ## Animation
 
 Write `{from..to}` in any parameter to sweep it across the frames:
 
 ```bash
-gopxsort run -i in.jpg -o anim.gif --frames 30 --pingpong "sort angle={0..90} lower={0.05..0.5}"
-gopxsort run -i in.jpg -o frames/f%03d.png --frames 60 "glitch seed={1..60}"
+sortcery run -i in.jpg -o anim.gif --frames 30 --pingpong "sort angle={0..90} lower={0.05..0.5}"
+sortcery run -i in.jpg -o frames/f%03d.png --frames 60 "glitch seed={1..60}"
 ```
 
 Animated GIF input is processed frame by frame, and parameter ranges still work:
 
 ```bash
-gopxsort run -i animated.gif -o sorted.gif "sort angle=90"
+sortcery run -i animated.gif -o sorted.gif "sort angle=90"
 ```
 
 ## Batch processing and pipes
 
 ```bash
-gopxsort run -i "photos/*.jpg" -o sorted/ "sort angle=90"
-gopxsort @vaporwave -i photos/ -o out/ --format png
-cat in.png | gopxsort @crt -i - -o - > out.png
+sortcery run -i "photos/*.jpg" -o sorted/ "sort angle=90"
+sortcery @vaporwave -i photos/ -o out/ --format png
+cat in.png | sortcery @crt -i - -o - > out.png
 ```
 
 ## Reproducible results
@@ -97,5 +97,5 @@ cat in.png | gopxsort @crt -i - -o - > out.png
 Random operations print the seed they used. Pass it back with `--seed` to get exactly the same image again:
 
 ```bash
-gopxsort glitch -i in.jpg -o out.png --seed 42
+sortcery glitch -i in.jpg -o out.png --seed 42
 ```

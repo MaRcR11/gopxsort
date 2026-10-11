@@ -7,7 +7,7 @@ import (
 	"math"
 	"strings"
 
-	"github.com/MaRcR11/gopxsort/internal/imgutil"
+	"github.com/MaRcR11/sortcery/internal/imgutil"
 )
 
 func Pixelate(img image.Image, size int) *image.NRGBA {
