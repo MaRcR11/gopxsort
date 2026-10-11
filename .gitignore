@@ -7,3 +7,11 @@ dist/
 *.test
 *.out
 coverage.*
+
+# Docs site build output and generated gallery
+site/public/
+site/resources/
+site/.hugo_build.lock
+site/assets/gallery/
+site/content/docs/gallery/
+site/content/docs/reference.md
