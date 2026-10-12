@@ -48,4 +48,5 @@ _ = imageio.Save("sorted.png", out, imageio.Options{})
   {{< card link="library" title="Go library" icon="code" >}}
   {{< card link="reference" title="Operations reference" icon="book-open" >}}
   {{< card link="gallery" title="Gallery" icon="photograph" >}}
+  {{< card link="../playground" title="Playground" icon="play" >}}
 {{< /cards >}}

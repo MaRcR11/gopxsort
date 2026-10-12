@@ -58,6 +58,16 @@ glow := effects.Blend(graded, effects.GaussianBlur(graded, 12), effects.BlendScr
 
 Built-in looks are available without a file through `effects.LUTByName("tealorange")`, and `effects.NewLUT` builds a LUT from any Go function. `WriteCube` saves it as a `.cube` file for other editors.
 
+## Part of the image
+
+Apply any effect, then keep it only inside a region or a mask image. Gray mask values blend, and `feather` softens the edge:
+
+```go
+glitched := effects.Glitch(img, 30, 0.15, 7)
+sky := effects.RegionMask(1920, 1080, image.Rect(0, 0, 1920, 430))
+out, err := effects.ApplyMask(img, glitched, sky, false, 20)
+```
+
 ## ASCII art as text
 
 The `ascii` operation renders characters into an image. From Go you can also get the plain text:

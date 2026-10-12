@@ -89,6 +89,11 @@ func (s *Spec) Param(name string) (Param, bool) {
 			return p, true
 		}
 	}
+	for _, p := range commonParams {
+		if p.Name == name {
+			return p, true
+		}
+	}
 	return Param{}, false
 }
 
@@ -221,6 +226,21 @@ func New(name string, args []string, seed int64) (Op, error) {
 	}
 	if err != nil {
 		return nil, err
+	}
+	inner := o.srcFn
+	if inner == nil {
+		fn := o.fn
+		inner = func(img, _ *image.NRGBA) (*image.NRGBA, error) { return fn(img) }
+	}
+	wrapped, err := maskWrapper(spec, a, inner)
+	if err == nil {
+		err = a.err
+	}
+	if err != nil {
+		return nil, err
+	}
+	if len(commonValues(spec, values)) > 0 {
+		o.fn, o.srcFn = nil, wrapped
 	}
 	return o, nil
 }

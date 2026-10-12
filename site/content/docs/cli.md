@@ -58,6 +58,25 @@ Two operations are special inside pipelines:
 - `mix 0.5` blends the current result with the original input, so `pixelate 24 | mix 0.5` applies the effect at half strength.
 - `resize original` scales back to the size of the input. `resize scale=0.2 | sort angle=90 | resize original filter=nearest` gives chunky, low-resolution sorting.
 
+## Part of the image
+
+Every operation accepts four common parameters to change only part of the image:
+
+| Parameter | |
+| --------- | - |
+| `--region x,y,width,height` | only change this rectangle (pixels) |
+| `--mask file.png` | only change where the mask is white; gray values blend |
+| `--invert-mask` | change the black areas of the mask, or everything outside the region |
+| `--feather n` | soften the edge by n pixels |
+
+```bash
+sortmancy glitch -i in.jpg -o out.png --region 0,0,1920,430
+sortmancy grayscale -i in.jpg -o out.png --region 560,180,800,500 --invert-mask --feather 40
+sortmancy run -i in.jpg -o out.png "sort angle=270 region=0,0,960,1080 | neon region=960,0,960,1080"
+```
+
+Operations that change the image size, such as `resize` or `ascii`, cannot be masked. For `sort`, `--mask` keeps its own meaning: masked pixels are never moved and also split the sorted spans. [Examples →](../gallery/masks)
+
 ## Presets
 
 Presets are ready-made pipelines. Run one directly, or use it as a stage:

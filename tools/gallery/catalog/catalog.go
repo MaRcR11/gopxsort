@@ -352,6 +352,20 @@ out := sorter.Sort(img, sorter.Options{
 		preset("newspaper", false), preset("oil", false), preset("planet", false), preset("databend", false),
 		preset("cinematic", false), preset("noir", true), preset("comic", false), preset("neon", false),
 	}},
+	{Slug: "masks", Title: "Masks and regions", Intro: "Every operation accepts `--region`, `--mask`, `--invert-mask` and `--feather` to change only part of the image.", Examples: []Example{
+		fx("glitch__region", "Glitch only the sky", "--slices 30 --shift 0.15 --seed 7 --region 0,0,1920,430",
+			"glitched := effects.Glitch(img, 30, 0.15, 7)\nout, err := effects.ApplyMask(img, glitched, effects.RegionMask(1920, 1080, image.Rect(0, 0, 1920, 430)), false, 0)"),
+		fx("grayscale__selective", "Selective color: everything gray except one area", "--region 560,180,800,500 --invert-mask --feather 40",
+			"out, err := effects.ApplyMask(img, effects.Grayscale(img), effects.RegionMask(1920, 1080, image.Rect(560, 180, 1360, 680)), true, 40)"),
+		needs(fx("pixelate__mask", "Pixelate through a mask image (the threshold example)", "--size 16 --mask threshold.jpg",
+			"mask, err := imageio.Load(\"threshold.jpg\")\nout, err := effects.ApplyMask(img, effects.Pixelate(img, 16), mask, false, 0)"), "threshold"),
+		{Name: "sort__region", Title: "Sort only the river, with a soft edge",
+			CLI: "sort -i city.jpg -o out.jpg --angle 270 --interval none --region 0,600,1920,480 --feather 30",
+			Code: "sorted := sorter.Sort(img, sorter.Options{\n\tInterval: sorter.None(),\n\tPath:     sorter.Linear(270),\n})\n" +
+				"out, err := effects.ApplyMask(img, sorted, effects.RegionMask(1920, 1080, image.Rect(0, 600, 1920, 1080)), false, 30)"},
+		pipe("pipeline_regions", "Different effects in different regions",
+			"sort angle=270 interval=edges edge=0.15 region=0,0,960,1080 | neon region=960,0,960,1080"),
+	}},
 	{Slug: "pipelines", Title: "Pipelines", Intro: "Chain operations with `|`.", Examples: []Example{
 		pipe("pipeline_streaks", "Sort, split and scanlines",
 			"sort angle=270 interval=edges edge=0.15 | shift | scanlines"),

@@ -24,6 +24,13 @@ cd sortmancy
 go build -o sortmancy ./cmd/sortmancy
 ```
 {{< /tab >}}
+{{< tab name="Docker" >}}
+The image contains only the binary (about 4 MB). Mount the folder with your images to `/work`:
+
+```bash
+docker run --rm -v "$PWD:/work" ghcr.io/marcr11/sortmancy @vhs -i in.jpg -o out.png
+```
+{{< /tab >}}
 {{< /tabs >}}
 
 Check that it works:

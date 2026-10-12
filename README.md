@@ -2,7 +2,7 @@
 
 Pixel sorting and glitch magic for Go: a command line tool and a library
 
-**[Documentation and gallery →](https://marcr11.github.io/sortmancy/)**
+**[Documentation and gallery →](https://marcr11.github.io/sortmancy/)** · **[Try it in your browser →](https://marcr11.github.io/sortmancy/playground/)**
 
 [![Go Reference](https://pkg.go.dev/badge/github.com/MaRcR11/sortmancy.svg)](https://pkg.go.dev/github.com/MaRcR11/sortmancy)
 [![CI](https://github.com/MaRcR11/sortmancy/actions/workflows/ci.yml/badge.svg)](https://github.com/MaRcR11/sortmancy/actions/workflows/ci.yml)
@@ -27,6 +27,7 @@ Original | Sorted by hue between edges | Spiral sort | Animated sweep
   - Artistic: ASCII art, low-poly and Voronoi mosaics, toon, neon edges, emboss, halftone, bloom, oil paint, kaleidoscope, tiling, droste.
   - Geometry: resize, crop, pixelate, mirror, flip, rotate.
   - Filters: blur, sharpen, edges, vignette.
+- **Masks and regions**: every operation can be limited to part of the image with `--region`, `--mask`, `--invert-mask` and `--feather`.
 - **Pipelines**: chain operations, e.g. `"sort angle=90 | glitch | dither palette=gameboy"`.
   `mix` blends the result with the original, and `resize original` scales back to the input size.
 - **20 presets**: ready-made looks such as `@vhs`, `@vaporwave`, `@crt`, `@cinematic`, `@noir`, `@comic`, `@neon` and `@chunky`.
@@ -35,17 +36,19 @@ Original | Sorted by hue between edges | Spiral sort | Animated sweep
 - **Formats**: reads PNG, JPEG, GIF, BMP, TIFF and WebP; writes all of them except WebP.
   stdin/stdout are supported.
 - **Batch processing**: process whole folders or glob patterns in one call.
+- **Web playground**: try every operation and preset in the browser, compiled to WebAssembly; images never leave your computer.
 - **Fast**: work is spread across all CPU cores. Sorting a 1080p image takes about 40 ms.
 - **Minimal dependencies**: the standard library plus `golang.org/x/image`.
 
 ## Installation
 
-Precompiled binaries for Windows, Linux and macOS are on the [releases](https://github.com/MaRcR11/sortmancy/releases) page.
-With Go 1.21 or newer:
-
 ```bash
-go install github.com/MaRcR11/sortmancy/cmd/sortmancy@latest
+go install github.com/MaRcR11/sortmancy/cmd/sortmancy@latest      # Go 1.21 or newer
+
+docker run --rm -v "$PWD:/work" ghcr.io/marcr11/sortmancy @vhs -i in.jpg -o out.png
 ```
+
+Precompiled binaries for Windows, Linux and macOS are also on the [releases](https://github.com/MaRcR11/sortmancy/releases) page.
 
 Use it as a library:
 
@@ -85,6 +88,7 @@ You can write parameters as `--name value`, as `name=value`, or positionally in 
 sortmancy sort -i in.jpg -o out.png --angle 90 --key hue
 sortmancy sort -i in.jpg -o out.png interval=edges edge=0.2 reverse
 sortmancy pixelate -i in.jpg -o out.png 12
+sortmancy glitch -i in.jpg -o out.png --region 0,0,1920,430
 sortmancy run -i in.jpg -o out.png "sort angle=45 lower=0.4 | shift | scanlines"
 sortmancy @vhs -i in.jpg -o out.png
 sortmancy run -i in.jpg -o out.png "@chunky | @crt"
@@ -241,7 +245,7 @@ _ = imageio.SaveAnimation("out.gif", out)
 
 ## Gallery
 
-**[See the full gallery on the docs site →](https://marcr11.github.io/sortmancy/docs/gallery/)** It has 167 examples covering every sort option, operation, preset and animation, each with the command and the equivalent Go code.
+**[See the full gallery on the docs site →](https://marcr11.github.io/sortmancy/docs/gallery/)** It has 172 examples covering every sort option, operation, preset and animation, each with the command and the equivalent Go code.
 
 All examples start from [img/city/city.jpg](img/city/city.jpg).
 
@@ -263,6 +267,7 @@ sortmancy/
 ├── internal/imgutil/    shared low-level helpers (not public API)
 ├── cmd/sortmancy/        the command line tool
 ├── tools/gallery/       generates the docs gallery and checks CLI against library output
+├── playground/          the browser playground (compiled to WebAssembly)
 ├── site/                the documentation site (Hugo + Hextra)
 └── img/                 sample image and README highlights (not part of the Go module)
 ```
@@ -283,7 +288,8 @@ The gallery, the operations reference and their images are generated, not commit
 
 ```bash
 go run ./tools/gallery/gensnippets   # after changing tools/gallery/catalog: regenerate the Go snippets
-go run ./tools/gallery               # render all examples, check CLI == library, write them into site/
+go run ./tools/gallery               # build the playground, render all examples, check CLI == library
+go run ./tools/gallery -examples=false   # only rebuild the WebAssembly playground (a few seconds)
 hugo server --source site            # preview at http://localhost:1313/sortmancy/
 go run ./tools/gallery -site "" -readme img/examples   # refresh the README highlight images
 ```
