@@ -23,6 +23,10 @@ var Presets = map[string]string{
 	"spiral":    "sort path=spiral spacing=6 interval=edges edge=0.2",
 	"planet":    "polar | vignette 0.4",
 	"databend":  "bend delay=12347 feedback=0.6 | interlace shift=6",
+	"cinematic": "autolevels | lut tealorange | vignette 0.4",
+	"noir":      "lut noir | vignette 0.6 | noise amount=0.04 mono",
+	"comic":     "toon | saturation 1.3",
+	"neon":      "neon",
 }
 
 func PresetNames() []string {

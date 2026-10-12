@@ -1,10 +1,13 @@
 package effects
 
 import (
+	"bytes"
 	"image"
 	"image/color"
+	"math"
 	"math/rand"
 	"slices"
+	"strings"
 	"testing"
 )
 
@@ -350,6 +353,179 @@ func TestSlitScanStretchesTheSlit(t *testing.T) {
 			if out.NRGBAAt(x, y) != src.NRGBAAt(col, y) {
 				t.Fatalf("pixel (%d,%d) is not the slit color", x, y)
 			}
+		}
+	}
+}
+
+func flatImage(w, h int, c color.NRGBA) *image.NRGBA {
+	img := image.NewNRGBA(image.Rect(0, 0, w, h))
+	for i := 0; i < w*h; i++ {
+		img.Pix[i*4], img.Pix[i*4+1], img.Pix[i*4+2], img.Pix[i*4+3] = c.R, c.G, c.B, c.A
+	}
+	return img
+}
+
+func TestColorIdentities(t *testing.T) {
+	src := randomImage(23, 17)
+	cases := map[string]*image.NRGBA{
+		"blend amount 0":      Blend(src, Invert(src), BlendMultiply, 0),
+		"multiply with white": Blend(src, flatImage(23, 17, color.NRGBA{255, 255, 255, 255}), BlendMultiply, 1),
+		"screen with black":   Blend(src, flatImage(23, 17, color.NRGBA{0, 0, 0, 255}), BlendScreen, 1),
+		"levels":              Levels(src, 0, 1, 1),
+		"curves":              Curves(src, []CurvePoint{{0, 0}, {1, 1}}),
+		"temperature":         Temperature(src, 0, 0),
+		"sepia 0":             Sepia(src, 0),
+		"channel mix":         ChannelMix(src, [3][3]float64{{1, 0, 0}, {0, 1, 0}, {0, 0, 1}}),
+		"median flat":         Median(flatImage(23, 17, color.NRGBA{9, 8, 7, 255}), 2),
+		"gaussian 0":          GaussianBlur(src, 0),
+		"tile 1x1":            Tile(src, 1, 1, false),
+		"droste 0":            Droste(src, 0.5, 0),
+	}
+	for name, out := range cases {
+		want := src
+		if name == "median flat" {
+			want = flatImage(23, 17, color.NRGBA{9, 8, 7, 255})
+		}
+		if !slices.Equal(out.Pix, want.Pix) {
+			t.Errorf("%s changed the image", name)
+		}
+	}
+	for i, v := range Blend(src, src, BlendDifference, 1).Pix {
+		if i%4 != 3 && v != 0 {
+			t.Fatal("difference with itself is not black")
+		}
+	}
+	for _, name := range BlendNames() {
+		m, _ := BlendByName(name)
+		if out := Blend(src, Invert(src), m, 0.7); out.Bounds() != src.Bounds() {
+			t.Fatalf("blend %s changed the size", name)
+		}
+	}
+}
+
+func TestAutoLevelsStretches(t *testing.T) {
+	img := image.NewNRGBA(image.Rect(0, 0, 16, 1))
+	for x := 0; x < 16; x++ {
+		v := uint8(100 + x*4)
+		img.SetNRGBA(x, 0, color.NRGBA{v, v, v, 255})
+	}
+	out := AutoLevels(img, 0)
+	if out.NRGBAAt(0, 0).R != 0 || out.NRGBAAt(15, 0).R != 255 {
+		t.Fatalf("not stretched: %v .. %v", out.NRGBAAt(0, 0), out.NRGBAAt(15, 0))
+	}
+	if eq := Equalize(img); eq.NRGBAAt(15, 0).R != 255 || eq.Bounds() != img.Bounds() {
+		t.Fatalf("equalize did not reach white: %v", eq.NRGBAAt(15, 0))
+	}
+}
+
+func TestCurveParsing(t *testing.T) {
+	if _, err := ParseCurve("0:0,0.5:0.7,1:1"); err != nil {
+		t.Fatal(err)
+	}
+	for _, bad := range []string{"", "0:0", "a:b,1:1", "0.5"} {
+		if _, err := ParseCurve(bad); err == nil {
+			t.Errorf("ParseCurve(%q) succeeded", bad)
+		}
+	}
+	if _, err := ParseMatrix("1,0,0,0,1,0,0,0"); err == nil {
+		t.Error("matrix with 8 numbers accepted")
+	}
+	lut := curveLUT([]CurvePoint{{0, 0}, {0.25, 0.1}, {0.75, 0.9}, {1, 1}})
+	for v := 1; v < 256; v++ {
+		if lut[v] < lut[v-1] {
+			t.Fatalf("curve is not monotone at %d", v)
+		}
+	}
+}
+
+func TestLUTRoundTrip(t *testing.T) {
+	id := NewLUT(17, func(r, g, b float64) (float64, float64, float64) { return r, g, b })
+	src := randomImage(20, 12)
+	out := ApplyLUT(src, id, 1)
+	for i := range src.Pix {
+		if d := int(src.Pix[i]) - int(out.Pix[i]); d < -1 || d > 1 {
+			t.Fatalf("identity LUT changed byte %d by %d", i, d)
+		}
+	}
+	tealorange, ok := LUTByName("tealorange")
+	if !ok {
+		t.Fatal("built-in LUT missing")
+	}
+	var buf bytes.Buffer
+	if err := tealorange.WriteCube(&buf, "test"); err != nil {
+		t.Fatal(err)
+	}
+	parsed, err := ParseCubeLUT(&buf)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if parsed.Size != tealorange.Size {
+		t.Fatalf("size %d, want %d", parsed.Size, tealorange.Size)
+	}
+	r1, g1, b1 := tealorange.Lookup(0.3, 0.6, 0.9)
+	r2, g2, b2 := parsed.Lookup(0.3, 0.6, 0.9)
+	if math.Abs(r1-r2)+math.Abs(g1-g2)+math.Abs(b1-b2) > 1e-4 {
+		t.Fatal("written and parsed LUT differ")
+	}
+	for _, bad := range []string{"LUT_1D_SIZE 4\n", "0 0 0\n", "LUT_3D_SIZE 2\n0 0 0\n", "LUT_3D_SIZE 2\nx y z\n"} {
+		if _, err := ParseCubeLUT(strings.NewReader(bad)); err == nil {
+			t.Errorf("ParseCubeLUT(%q) succeeded", bad)
+		}
+	}
+}
+
+func TestASCII(t *testing.T) {
+	black := flatImage(70, 26, color.NRGBA{0, 0, 0, 255})
+	white := flatImage(70, 26, color.NRGBA{255, 255, 255, 255})
+	b, w := ASCII(black, 10, ""), ASCII(white, 10, "")
+	lines := strings.Split(strings.TrimSuffix(b, "\n"), "\n")
+	if len(lines) != 2 || len(lines[0]) != 10 {
+		t.Fatalf("unexpected grid %q", b)
+	}
+	if strings.Trim(b, " \n") != "" || strings.Trim(w, "@\n") != "" {
+		t.Fatalf("wrong characters: %q / %q", b, w)
+	}
+	if img := ASCIIImage(white, 10, "", true); img.Bounds().Dx() != 70 || img.Bounds().Dy() != 26 {
+		t.Fatalf("ascii image size %v", img.Bounds())
+	}
+}
+
+func TestMosaics(t *testing.T) {
+	src := randomImage(60, 40)
+	for name, out := range map[string]*image.NRGBA{"voronoi": Voronoi(src, 20, 1), "lowpoly": LowPoly(src, 10, 1)} {
+		if out.Bounds() != src.Bounds() {
+			t.Fatalf("%s changed the size", name)
+		}
+		colors := map[color.NRGBA]bool{}
+		for i := 0; i < 60*40; i++ {
+			colors[out.NRGBAAt(i%60, i/60)] = true
+		}
+		if len(colors) > 60 {
+			t.Fatalf("%s has %d colors, expected flat regions", name, len(colors))
+		}
+	}
+}
+
+func TestMorphologyAndStylize(t *testing.T) {
+	src := randomImage(30, 20)
+	d, e := Dilate(src, 2), Erode(src, 2)
+	for i := range src.Pix {
+		if i%4 == 3 {
+			continue
+		}
+		if d.Pix[i] < src.Pix[i] || e.Pix[i] > src.Pix[i] {
+			t.Fatalf("dilate/erode went the wrong way at byte %d", i)
+		}
+	}
+	if out := Emboss(flatImage(10, 10, color.NRGBA{50, 90, 200, 255}), 2, 45); out.NRGBAAt(5, 5).R != 128 {
+		t.Fatalf("emboss of a flat image is %v, want mid gray", out.NRGBAAt(5, 5))
+	}
+	for name, out := range map[string]*image.NRGBA{
+		"toon": Toon(src, 4, 0.2), "neon": Neon(src, 0.25, 6), "gaussian": GaussianBlur(src, 3),
+		"motion": MotionBlur(src, 30, 9), "zoom": ZoomBlur(src, 0.3, 8), "tile": Tile(src, 3, 2, true), "droste": Droste(src, 0.6, 4),
+	} {
+		if out.Bounds() != src.Bounds() {
+			t.Errorf("%s changed the size to %v", name, out.Bounds())
 		}
 	}
 }
