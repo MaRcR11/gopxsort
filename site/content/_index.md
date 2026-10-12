@@ -23,6 +23,7 @@ layout: hextra-home
 <div class="hx:mb-6">
 {{< hextra/hero-button text="Get started" link="docs" >}}
 {{< hextra/hero-button text="See the gallery" link="docs/gallery" style="background: transparent; border: 1px solid currentColor;" >}}
+{{< hextra/hero-button text="Try it in the browser" link="playground" style="background: transparent; border: 1px solid currentColor;" >}}
 </div>
 
 <div class="hx:mt-12"></div>

@@ -15,3 +15,6 @@ site/.hugo_build.lock
 site/assets/gallery/
 site/content/docs/gallery/
 site/content/docs/reference.md
+site/static/playground/sortmancy.wasm
+site/static/playground/wasm_exec.js
+site/static/playground/city.jpg

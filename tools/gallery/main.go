@@ -26,6 +26,8 @@ const source = "img/city/city.jpg"
 func main() {
 	site := flag.String("site", "site", "Hugo site directory to write the gallery into; empty skips it")
 	readme := flag.String("readme", "", "directory to write the README highlight images into; empty skips it")
+	withExamples := flag.Bool("examples", true, "render and check all gallery examples")
+	withPlayground := flag.Bool("playground", true, "build the WebAssembly playground into the site")
 	flag.Parse()
 
 	root, err := os.Getwd()
@@ -42,6 +44,16 @@ func main() {
 		return filepath.Join(root, p)
 	}
 	*site, *readme = abs(*site), abs(*readme)
+
+	if *withPlayground && *site != "" {
+		if err := buildPlayground(root, filepath.Join(*site, "static", "playground")); err != nil {
+			log.Fatalf("playground: %v", err)
+		}
+		fmt.Println("built the WebAssembly playground")
+	}
+	if !*withExamples {
+		return
+	}
 
 	work, err := os.MkdirTemp("", "sortmancy-gallery-")
 	if err != nil {
@@ -102,6 +114,39 @@ func main() {
 		}
 		fmt.Println("wrote README highlights into", *readme)
 	}
+}
+
+func buildPlayground(root, dir string) error {
+	if err := os.MkdirAll(dir, 0o755); err != nil {
+		return err
+	}
+	build := exec.Command("go", "build", "-trimpath", "-ldflags=-s -w", "-o", filepath.Join(dir, "sortmancy.wasm"), "./playground")
+	build.Dir = root
+	build.Env = append(os.Environ(), "GOOS=js", "GOARCH=wasm")
+	build.Stdout, build.Stderr = os.Stdout, os.Stderr
+	if err := build.Run(); err != nil {
+		return err
+	}
+	out, err := exec.Command("go", "env", "GOROOT").Output()
+	if err != nil {
+		return err
+	}
+	goroot := strings.TrimSpace(string(out))
+	loader := filepath.Join(goroot, "lib", "wasm", "wasm_exec.js")
+	if _, err := os.Stat(loader); err != nil {
+		loader = filepath.Join(goroot, "misc", "wasm", "wasm_exec.js")
+	}
+	copies := map[string]string{loader: "wasm_exec.js", filepath.Join(root, source): "city.jpg"}
+	for from, to := range copies {
+		data, err := os.ReadFile(from)
+		if err != nil {
+			return err
+		}
+		if err := os.WriteFile(filepath.Join(dir, to), data, 0o644); err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 func writeSampleLUT(path string) error {

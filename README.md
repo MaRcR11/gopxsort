@@ -2,7 +2,7 @@
 
 Pixel sorting and glitch magic for Go: a command line tool and a library
 
-**[Documentation and gallery →](https://marcr11.github.io/sortmancy/)**
+**[Documentation and gallery →](https://marcr11.github.io/sortmancy/)** · **[Try it in your browser →](https://marcr11.github.io/sortmancy/playground/)**
 
 [![Go Reference](https://pkg.go.dev/badge/github.com/MaRcR11/sortmancy.svg)](https://pkg.go.dev/github.com/MaRcR11/sortmancy)
 [![CI](https://github.com/MaRcR11/sortmancy/actions/workflows/ci.yml/badge.svg)](https://github.com/MaRcR11/sortmancy/actions/workflows/ci.yml)
@@ -36,6 +36,7 @@ Original | Sorted by hue between edges | Spiral sort | Animated sweep
 - **Formats**: reads PNG, JPEG, GIF, BMP, TIFF and WebP; writes all of them except WebP.
   stdin/stdout are supported.
 - **Batch processing**: process whole folders or glob patterns in one call.
+- **Web playground**: try every operation and preset in the browser, compiled to WebAssembly; images never leave your computer.
 - **Fast**: work is spread across all CPU cores. Sorting a 1080p image takes about 40 ms.
 - **Minimal dependencies**: the standard library plus `golang.org/x/image`.
 
@@ -266,6 +267,7 @@ sortmancy/
 ├── internal/imgutil/    shared low-level helpers (not public API)
 ├── cmd/sortmancy/        the command line tool
 ├── tools/gallery/       generates the docs gallery and checks CLI against library output
+├── playground/          the browser playground (compiled to WebAssembly)
 ├── site/                the documentation site (Hugo + Hextra)
 └── img/                 sample image and README highlights (not part of the Go module)
 ```
@@ -286,7 +288,8 @@ The gallery, the operations reference and their images are generated, not commit
 
 ```bash
 go run ./tools/gallery/gensnippets   # after changing tools/gallery/catalog: regenerate the Go snippets
-go run ./tools/gallery               # render all examples, check CLI == library, write them into site/
+go run ./tools/gallery               # build the playground, render all examples, check CLI == library
+go run ./tools/gallery -examples=false   # only rebuild the WebAssembly playground (a few seconds)
 hugo server --source site            # preview at http://localhost:1313/sortmancy/
 go run ./tools/gallery -site "" -readme img/examples   # refresh the README highlight images
 ```
