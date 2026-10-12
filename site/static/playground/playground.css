@@ -4,6 +4,9 @@
   --pg-muted: rgba(0, 0, 0, 0.55);
   --pg-accent: hsl(212, 100%, 45%);
   --pg-error: #c62828;
+  --pg-input-bg: #ffffff;
+  --pg-input-fg: #111827;
+  color-scheme: light;
   margin-top: 1.5rem;
 }
 html.dark .pg {
@@ -12,6 +15,9 @@ html.dark .pg {
   --pg-muted: rgba(255, 255, 255, 0.6);
   --pg-accent: hsl(212, 100%, 60%);
   --pg-error: #ff8a80;
+  --pg-input-bg: #1f2125;
+  --pg-input-fg: #e5e7eb;
+  color-scheme: dark;
 }
 .pg-intro {
   text-align: center;
@@ -106,14 +112,16 @@ html.dark .pg {
 .pg textarea {
   width: 100%;
   border: 1px solid var(--pg-border);
-  background: transparent;
+  background-color: var(--pg-input-bg);
   border-radius: 0.375rem;
   padding: 0.35rem 0.5rem;
   font-size: 0.875rem;
-  color: inherit;
+  color: var(--pg-input-fg);
 }
-.pg select option {
-  color: initial;
+.pg select option,
+.pg select optgroup {
+  background-color: var(--pg-input-bg);
+  color: var(--pg-input-fg);
 }
 .pg textarea {
   font-family: ui-monospace, monospace;
