@@ -3,10 +3,10 @@ package snippets
 import (
 	"image"
 
-	"github.com/MaRcR11/sortcery/effects"
-	"github.com/MaRcR11/sortcery/imageio"
-	"github.com/MaRcR11/sortcery/pipeline"
-	"github.com/MaRcR11/sortcery/sorter"
+	"github.com/MaRcR11/sortmancy/effects"
+	"github.com/MaRcR11/sortmancy/imageio"
+	"github.com/MaRcR11/sortmancy/pipeline"
+	"github.com/MaRcR11/sortmancy/sorter"
 )
 
 var (

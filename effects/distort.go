@@ -6,7 +6,7 @@ import (
 	"math"
 	"math/rand"
 
-	"github.com/MaRcR11/sortcery/internal/imgutil"
+	"github.com/MaRcR11/sortmancy/internal/imgutil"
 )
 
 func bilinear(src *image.NRGBA, fx, fy float64) color.NRGBA {

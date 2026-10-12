@@ -1,15 +1,15 @@
-package sortcery_test
+package sortmancy_test
 
 import (
 	"image"
 	"image/color"
 	"log"
 
-	"github.com/MaRcR11/sortcery"
-	"github.com/MaRcR11/sortcery/effects"
-	"github.com/MaRcR11/sortcery/imageio"
-	"github.com/MaRcR11/sortcery/pipeline"
-	"github.com/MaRcR11/sortcery/sorter"
+	"github.com/MaRcR11/sortmancy"
+	"github.com/MaRcR11/sortmancy/effects"
+	"github.com/MaRcR11/sortmancy/imageio"
+	"github.com/MaRcR11/sortmancy/pipeline"
+	"github.com/MaRcR11/sortmancy/sorter"
 )
 
 func Example_sort() {
@@ -64,7 +64,7 @@ func Example_pipeline() {
 }
 
 func Example_applyFile() {
-	err := sortcery.ApplyFile("img/city/city.jpg", "out.jpg", "sort angle=45 | vignette")
+	err := sortmancy.ApplyFile("img/city/city.jpg", "out.jpg", "sort angle=45 | vignette")
 	if err != nil {
 		log.Fatal(err)
 	}

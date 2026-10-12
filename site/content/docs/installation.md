@@ -10,18 +10,18 @@ weight: 1
 With Go 1.21 or newer:
 
 ```bash
-go install github.com/MaRcR11/sortcery/cmd/sortcery@latest
+go install github.com/MaRcR11/sortmancy/cmd/sortmancy@latest
 ```
 {{< /tab >}}
 {{< tab name="Binary" >}}
 Download a precompiled binary for Windows, Linux or macOS from the
-[releases page](https://github.com/MaRcR11/sortcery/releases), unpack it and put `sortcery` on your `PATH`.
+[releases page](https://github.com/MaRcR11/sortmancy/releases), unpack it and put `sortmancy` on your `PATH`.
 {{< /tab >}}
 {{< tab name="From source" >}}
 ```bash
-git clone https://github.com/MaRcR11/sortcery.git
-cd sortcery
-go build -o sortcery ./cmd/sortcery
+git clone https://github.com/MaRcR11/sortmancy.git
+cd sortmancy
+go build -o sortmancy ./cmd/sortmancy
 ```
 {{< /tab >}}
 {{< /tabs >}}
@@ -29,14 +29,14 @@ go build -o sortcery ./cmd/sortcery
 Check that it works:
 
 ```bash
-sortcery version
-sortcery list
+sortmancy version
+sortmancy list
 ```
 
 ## Library
 
 ```bash
-go get github.com/MaRcR11/sortcery
+go get github.com/MaRcR11/sortmancy
 ```
 
 The library only depends on the Go standard library and `golang.org/x/image`.

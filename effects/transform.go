@@ -5,7 +5,7 @@ import (
 	"math"
 	"strings"
 
-	"github.com/MaRcR11/sortcery/internal/imgutil"
+	"github.com/MaRcR11/sortmancy/internal/imgutil"
 )
 
 type Filter int

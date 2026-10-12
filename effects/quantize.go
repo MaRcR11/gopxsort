@@ -4,7 +4,7 @@ import (
 	"image"
 	"image/color"
 
-	"github.com/MaRcR11/sortcery/internal/imgutil"
+	"github.com/MaRcR11/sortmancy/internal/imgutil"
 )
 
 func MedianCut(img image.Image, colors int) color.Palette {

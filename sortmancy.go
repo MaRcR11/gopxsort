@@ -1,11 +1,11 @@
-package sortcery
+package sortmancy
 
 import (
 	"image"
 
-	"github.com/MaRcR11/sortcery/imageio"
-	"github.com/MaRcR11/sortcery/pipeline"
-	"github.com/MaRcR11/sortcery/sorter"
+	"github.com/MaRcR11/sortmancy/imageio"
+	"github.com/MaRcR11/sortmancy/pipeline"
+	"github.com/MaRcR11/sortmancy/sorter"
 )
 
 func Sort(img image.Image, opts sorter.Options) *image.NRGBA {

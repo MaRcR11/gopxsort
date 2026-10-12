@@ -8,7 +8,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/MaRcR11/sortcery/tools/gallery/catalog"
+	"github.com/MaRcR11/sortmancy/tools/gallery/catalog"
 )
 
 const output = "tools/gallery/snippets/snippets_gen.go"
@@ -27,10 +27,10 @@ func main() {
 import (
 	"image"
 
-	"github.com/MaRcR11/sortcery/effects"
-	"github.com/MaRcR11/sortcery/imageio"
-	"github.com/MaRcR11/sortcery/pipeline"
-	"github.com/MaRcR11/sortcery/sorter"
+	"github.com/MaRcR11/sortmancy/effects"
+	"github.com/MaRcR11/sortmancy/imageio"
+	"github.com/MaRcR11/sortmancy/pipeline"
+	"github.com/MaRcR11/sortmancy/sorter"
 )
 
 var (

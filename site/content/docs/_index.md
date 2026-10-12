@@ -3,7 +3,7 @@ title: Introduction
 weight: 1
 ---
 
-sortcery is a pixel sorting and glitch art toolkit for Go. You can use it as a command line tool or import it as a library.
+sortmancy is a pixel sorting and glitch art toolkit for Go. You can use it as a command line tool or import it as a library.
 
 ![Sorted by hue between edges](/gallery/sort_hue_edges.jpg)
 
@@ -12,20 +12,20 @@ sortcery is a pixel sorting and glitch art toolkit for Go. You can use it as a c
 Install the command line tool:
 
 ```bash
-go install github.com/MaRcR11/sortcery/cmd/sortcery@latest
+go install github.com/MaRcR11/sortmancy/cmd/sortmancy@latest
 ```
 
 Sort an image from top to bottom by hue:
 
 ```bash
-sortcery sort -i photo.jpg -o sorted.png --angle 270 --key hue
+sortmancy sort -i photo.jpg -o sorted.png --angle 270 --key hue
 ```
 
 Chain several operations, or use a preset:
 
 ```bash
-sortcery run -i photo.jpg -o out.png "sort angle=45 lower=0.4 | shift | scanlines"
-sortcery @vaporwave -i photo.jpg -o out.png
+sortmancy run -i photo.jpg -o out.png "sort angle=45 lower=0.4 | shift | scanlines"
+sortmancy @vaporwave -i photo.jpg -o out.png
 ```
 
 Or use it from Go:

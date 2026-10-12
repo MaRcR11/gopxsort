@@ -7,9 +7,9 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/MaRcR11/sortcery/effects"
-	"github.com/MaRcR11/sortcery/imageio"
-	"github.com/MaRcR11/sortcery/sorter"
+	"github.com/MaRcR11/sortmancy/effects"
+	"github.com/MaRcR11/sortmancy/imageio"
+	"github.com/MaRcR11/sortmancy/sorter"
 )
 
 func str(name, def, help string, choices ...string) Param {

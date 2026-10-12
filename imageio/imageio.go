@@ -19,7 +19,7 @@ import (
 	"golang.org/x/image/tiff"
 	_ "golang.org/x/image/webp"
 
-	"github.com/MaRcR11/sortcery/internal/imgutil"
+	"github.com/MaRcR11/sortmancy/internal/imgutil"
 )
 
 type Format string
