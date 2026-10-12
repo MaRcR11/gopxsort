@@ -1,0 +1,4 @@
+{{- $v := now.Unix -}}
+<link rel="stylesheet" href="playground.css?v={{ $v }}">
+<script>window.sortmancyAssetVersion = "{{ $v }}";</script>
+<script src="playground.js?v={{ $v }}" defer></script>

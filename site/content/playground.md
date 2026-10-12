@@ -4,7 +4,7 @@ layout: wide
 toc: false
 ---
 
-<link rel="stylesheet" href="playground.css">
+{{< playground-assets >}}
 <div id="pg" class="pg">
 <p class="pg-intro">Try every operation and preset in your browser. sortmancy runs locally as WebAssembly, so your images never leave your computer. Large images are scaled down for speed; the command below gives you the full-size result.</p>
 <div class="pg-grid">
@@ -40,4 +40,3 @@ toc: false
 </section>
 </div>
 </div>
-<script src="playground.js" defer></script>
