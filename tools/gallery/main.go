@@ -344,6 +344,19 @@ func referencePage() string {
 	b.WriteString("---\ntitle: Operations reference\nweight: 5\n---\n\n")
 	fmt.Fprintf(&b, "All %d operations with their parameters. This page is generated from the code, so it always matches the current version. "+
 		"Run `sortmancy help <operation>` for the same information in the terminal.\n\n", len(pipeline.Specs()))
+	b.WriteString("## Common parameters {#common}\n\n" +
+		"Every operation also accepts these, to change only part of the image. " +
+		"`sort` has its own `mask` and `invert-mask`, where masked pixels also split the sorted spans; `region` and `feather` work for it too. " +
+		"[See the examples in the gallery](../gallery/masks/).\n\n" +
+		"| Parameter | Type | Default | Description |\n|-|-|-|-|\n")
+	for _, p := range pipeline.CommonParams() {
+		def := p.Default
+		if def != "" {
+			def = "`" + def + "`"
+		}
+		fmt.Fprintf(&b, "| `%s` | %s | %s | %s |\n", p.Name, p.Kind, escape(def), escape(p.Help))
+	}
+	b.WriteString("\n")
 	for _, s := range pipeline.Specs() {
 		fmt.Fprintf(&b, "## %s {#%s}\n\n%s\n\n", s.Name, s.Name, s.Help)
 		if sec, e, ok := exampleFor(s.Name); ok {

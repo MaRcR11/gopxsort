@@ -41,6 +41,10 @@ OPTIONS:
     -t, --threshold <n>     classic mode only: sort pixels brighter than n
     -h, --help              print help
 
+PART OF THE IMAGE:
+    Every operation accepts --region x,y,width,height and --mask file.png to change only
+    part of the image; add --invert-mask to swap inside and outside, --feather n for soft edges.
+
 ANIMATION:
     Write a range as {from..to} in any parameter; it is swept over the frames.
     Animated GIF input is processed frame by frame.
@@ -51,6 +55,8 @@ EXAMPLES:
     sortmancy run -i city.jpg -o out.png "sort angle=45 lower=0.4 | shift | scanlines"
     sortmancy run -i city.jpg -o out.png "@chunky | @crt"
     sortmancy run -i city.jpg -o anim.gif --frames 30 --pingpong "sort lower={0.1..0.7}"
+    sortmancy glitch -i city.jpg -o out.png --region 0,0,1920,540
+    sortmancy grayscale -i city.jpg -o out.png --region 560,180,800,500 --invert-mask --feather 40
     sortmancy run -i "photos/*.jpg" -o sorted/ "sort angle=90"
     cat in.png | sortmancy @vhs -i - -o - > out.png
 `
@@ -74,17 +80,26 @@ func printOpHelp(w io.Writer, name string) error {
 	if !ok {
 		return fmt.Errorf("unknown operation %q, run \"sortmancy list\"", name)
 	}
-	fmt.Fprintf(w, "%s - %s\n\nUSAGE:\n    sortmancy %s -i <input> -o <output>", s.Name, s.Help, s.Name)
+	fmt.Fprintf(w, "%s - %s\n\nUSAGE:\n    sortmancy %s -i <input> -o <output> [--param value ...]\n", s.Name, s.Help, s.Name)
 	if len(s.Params) > 0 {
-		fmt.Fprint(w, " [--param value ...]")
+		fmt.Fprintln(w, "\nPARAMETERS:")
+		printParams(w, s.Params)
 	}
-	fmt.Fprintln(w)
-	if len(s.Params) == 0 {
-		return nil
+	var common []pipeline.Param
+	for _, p := range pipeline.CommonParams() {
+		if own, _ := s.Param(p.Name); own.Help == p.Help {
+			common = append(common, p)
+		}
 	}
-	fmt.Fprintln(w, "\nPARAMETERS:")
+	fmt.Fprintln(w, "\nCOMMON PARAMETERS (all operations):")
+	printParams(w, common)
+	fmt.Fprintf(w, "\nParameters can also be written as name=value, or as positional values in the order above.\n")
+	return nil
+}
+
+func printParams(w io.Writer, params []pipeline.Param) {
 	tw := tabwriter.NewWriter(w, 0, 0, 2, ' ', 0)
-	for _, p := range s.Params {
+	for _, p := range params {
 		def := ""
 		if p.Default != "" {
 			def = " [default: " + p.Default + "]"
@@ -95,8 +110,6 @@ func printOpHelp(w io.Writer, name string) error {
 		}
 	}
 	tw.Flush()
-	fmt.Fprintf(w, "\nParameters can also be written as name=value, or as positional values in the order above.\n")
-	return nil
 }
 
 func printPresets(w io.Writer) {

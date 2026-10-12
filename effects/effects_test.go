@@ -529,3 +529,19 @@ func TestMorphologyAndStylize(t *testing.T) {
 		}
 	}
 }
+
+func TestApplyMask(t *testing.T) {
+	src := randomImage(20, 10)
+	inv := Invert(src)
+	all, _ := ApplyMask(src, inv, RegionMask(20, 10, image.Rect(0, 0, 20, 10)), false, 0)
+	none, _ := ApplyMask(src, inv, RegionMask(20, 10, image.Rect(0, 0, 20, 10)), true, 0)
+	if !slices.Equal(all.Pix, inv.Pix) || !slices.Equal(none.Pix, src.Pix) {
+		t.Fatal("white mask should keep the effect and an inverted one should remove it")
+	}
+	if _, err := ApplyMask(src, Scale(src, 0.5, Nearest), RegionMask(20, 10, image.Rect(0, 0, 5, 5)), false, 0); err == nil {
+		t.Fatal("expected error for different sizes")
+	}
+	if r, err := ParseRegion("1,2,3,4"); err != nil || r != image.Rect(1, 2, 4, 6) {
+		t.Fatalf("ParseRegion: %v %v", r, err)
+	}
+}

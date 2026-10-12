@@ -2,6 +2,9 @@ package pipeline
 
 import (
 	"image"
+	"image/png"
+	"os"
+	"path/filepath"
 	"strings"
 	"testing"
 )
@@ -181,4 +184,72 @@ func FuzzParse(f *testing.F) {
 		}
 		_ = p.String()
 	})
+}
+
+func TestRegionAndMaskForAnyOperation(t *testing.T) {
+	src := testImage()
+	run := func(spec string) *image.NRGBA {
+		t.Helper()
+		p, err := Parse(spec)
+		if err != nil {
+			t.Fatalf("%s: %v", spec, err)
+		}
+		out, err := p.Apply(src)
+		if err != nil {
+			t.Fatalf("%s: %v", spec, err)
+		}
+		return out
+	}
+	inv := run("invert region=4,2,10,6")
+	for y := 0; y < 16; y++ {
+		for x := 0; x < 24; x++ {
+			inside := x >= 4 && x < 14 && y >= 2 && y < 8
+			a, b := src.NRGBAAt(x, y), inv.NRGBAAt(x, y)
+			if inside && b.R != 255-a.R {
+				t.Fatalf("pixel (%d,%d) inside the region was not inverted", x, y)
+			}
+			if !inside && a != b {
+				t.Fatalf("pixel (%d,%d) outside the region changed", x, y)
+			}
+		}
+	}
+	outside := run("invert region=4,2,10,6 invert-mask")
+	if outside.NRGBAAt(5, 3) != src.NRGBAAt(5, 3) || outside.NRGBAAt(0, 0).R != 255-src.NRGBAAt(0, 0).R {
+		t.Fatal("invert-mask did not swap inside and outside")
+	}
+	soft := run("invert region=0,0,12,16 feather=6")
+	mid := soft.NRGBAAt(11, 8).R
+	if mid == src.NRGBAAt(11, 8).R || mid == 255-src.NRGBAAt(11, 8).R {
+		t.Fatal("feather did not blend the edge")
+	}
+	if s := run("sort interval=none region=0,0,24,8"); s.NRGBAAt(3, 12) != src.NRGBAAt(3, 12) {
+		t.Fatal("sort changed pixels outside its region")
+	}
+
+	maskPath := filepath.Join(t.TempDir(), "mask.png")
+	m := image.NewGray(image.Rect(0, 0, 2, 1))
+	m.Pix[0] = 255
+	f, _ := os.Create(maskPath)
+	png.Encode(f, m)
+	f.Close()
+	half := run("grayscale mask=" + maskPath)
+	if c := half.NRGBAAt(20, 5); c != src.NRGBAAt(20, 5) {
+		t.Fatal("pixel in the black half of the mask changed")
+	}
+	if c := half.NRGBAAt(2, 5); c.R != c.G || c.G != c.B {
+		t.Fatal("pixel in the white half of the mask is not gray")
+	}
+
+	for _, bad := range []string{"invert feather=3", "invert region=1,2,3", "invert region=0,0,0,5", "invert mask=/no/such/file.png"} {
+		if _, err := Parse(bad); err == nil {
+			t.Errorf("Parse(%q) succeeded", bad)
+		}
+	}
+	p, err := Parse("resize scale=0.5 region=0,0,4,4")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, err := p.Apply(src); err == nil {
+		t.Fatal("masking a size-changing operation should fail")
+	}
 }

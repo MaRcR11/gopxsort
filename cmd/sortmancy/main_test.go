@@ -51,6 +51,8 @@ func TestEndToEnd(t *testing.T) {
 		{"sort", "-i", in, "-o", filepath.Join(dir, "sort.png"), "--angle", "90", "--key", "hue"},
 		{"run", "-i", in, "-o", filepath.Join(dir, "run.png"), "sort path=radial | glitch | dither atkinson palette=cga"},
 		{"pixelate", "-i", in, "-o", filepath.Join(dir, "px.gif"), "4"},
+		{"glitch", "-i", in, "-o", filepath.Join(dir, "region.png"), "--region", "0,0,8,4", "--feather", "2"},
+		{"invert", "-i", in, "-o", filepath.Join(dir, "outside.png"), "--region=2,2,4,4", "--invert-mask"},
 		{"@vhs", "-i", in, "-o", filepath.Join(dir, "vhs.bmp")},
 		{"run", "-i", in, "-o", filepath.Join(dir, "anim.gif"), "--frames", "3", "--pingpong", "sort lower={0.1..0.6}"},
 		{"run", "-i", filepath.Join(dir, "anim.gif"), "-o", filepath.Join(dir, "frame%02d.png"), "invert"},

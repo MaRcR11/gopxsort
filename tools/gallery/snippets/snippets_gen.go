@@ -852,6 +852,33 @@ var Funcs = map[string]Func{
 		out, err = p.Apply(img)
 		return
 	},
+	"glitch__region": func(img image.Image, outGIF string) (out image.Image, err error) {
+		glitched := effects.Glitch(img, 30, 0.15, 7)
+		out, err = effects.ApplyMask(img, glitched, effects.RegionMask(1920, 1080, image.Rect(0, 0, 1920, 430)), false, 0)
+		return
+	},
+	"grayscale__selective": func(img image.Image, outGIF string) (out image.Image, err error) {
+		out, err = effects.ApplyMask(img, effects.Grayscale(img), effects.RegionMask(1920, 1080, image.Rect(560, 180, 1360, 680)), true, 40)
+		return
+	},
+	"pixelate__mask": func(img image.Image, outGIF string) (out image.Image, err error) {
+		mask, err := imageio.Load("threshold.jpg")
+		out, err = effects.ApplyMask(img, effects.Pixelate(img, 16), mask, false, 0)
+		return
+	},
+	"sort__region": func(img image.Image, outGIF string) (out image.Image, err error) {
+		sorted := sorter.Sort(img, sorter.Options{
+			Interval: sorter.None(),
+			Path:     sorter.Linear(270),
+		})
+		out, err = effects.ApplyMask(img, sorted, effects.RegionMask(1920, 1080, image.Rect(0, 600, 1920, 1080)), false, 30)
+		return
+	},
+	"pipeline_regions": func(img image.Image, outGIF string) (out image.Image, err error) {
+		p, err := pipeline.Parse("sort angle=270 interval=edges edge=0.15 region=0,0,960,1080 | neon region=960,0,960,1080")
+		out, err = p.Apply(img)
+		return
+	},
 	"pipeline_streaks": func(img image.Image, outGIF string) (out image.Image, err error) {
 		p, err := pipeline.Parse("sort angle=270 interval=edges edge=0.15 | shift | scanlines")
 		out, err = p.Apply(img)

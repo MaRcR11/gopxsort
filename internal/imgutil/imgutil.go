@@ -255,3 +255,11 @@ func ResizeNearest(img image.Image, w, h int) *image.NRGBA {
 	}
 	return dst
 }
+
+func ToGray(img *image.NRGBA) *image.Gray {
+	g := image.NewGray(img.Rect)
+	for i := range g.Pix {
+		g.Pix[i] = Clamp8(Luma(At(img.Pix, i)) * 255)
+	}
+	return g
+}

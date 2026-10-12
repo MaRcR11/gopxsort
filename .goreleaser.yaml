@@ -1,7 +1,10 @@
 version: 2
 
+project_name: sortmancy
+
 builds:
   - main: ./cmd/sortmancy
+    binary: sortmancy
     env:
       - CGO_ENABLED=0
     goos: [linux, windows, darwin]
@@ -17,3 +20,24 @@ archives:
 
 checksum:
   name_template: checksums.txt
+
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - "^Merge pull request"
+      - "^Merge branch"
+
+dockers_v2:
+  - images:
+      - "ghcr.io/marcr11/sortmancy"
+    tags:
+      - "{{ .Version }}"
+      - "{{ if not .Prerelease }}latest{{ end }}"
+    platforms:
+      - linux/amd64
+      - linux/arm64
+    labels:
+      org.opencontainers.image.source: "https://github.com/MaRcR11/sortmancy"
+      org.opencontainers.image.description: "Pixel sorting and glitch art from the command line"
+      org.opencontainers.image.licenses: MIT
