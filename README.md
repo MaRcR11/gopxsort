@@ -19,17 +19,17 @@ Original | Sorted by hue between edges | Spiral sort | Animated sweep
   - Paths: straight lines at any angle, sine waves, flow fields, contours, spirals, Hilbert curves, concentric rings, radial rays.
   - Span modes: sort, shuffle, average, gradient, smear, per-channel, mirror.
   - Tile sorting, masks, intervals taken from another image, reverse order, randomness, reproducible seeds.
-- **51 operations** in total:
-  - Color: invert, posterize, hue, gradient map, ...
+- **74 operations** in total:
+  - Color: blend modes, auto-levels, histogram equalization, levels, curves, temperature, sepia, channel mixer, `.cube` LUTs and built-in film looks, gradient map, hue, posterize, ...
   - Glitch: RGB shift, chromatic aberration, slice glitch, block shuffle, JPEG corruption, data bending, echo, interlace, pixel scatter, VHS tracking, melt, wave, scanlines, noise.
   - Distortion: displacement maps, swirl, ripple, bulge/pinch, polar coordinates, CRT curvature, slit-scan.
   - Retro: 10 dithering algorithms with retro palettes, median-cut quantization.
-  - Artistic: halftone, bloom, oil paint, kaleidoscope.
+  - Artistic: ASCII art, low-poly and Voronoi mosaics, toon, neon edges, emboss, halftone, bloom, oil paint, kaleidoscope, tiling, droste.
   - Geometry: resize, crop, pixelate, mirror, flip, rotate.
   - Filters: blur, sharpen, edges, vignette.
 - **Pipelines**: chain operations, e.g. `"sort angle=90 | glitch | dither palette=gameboy"`.
   `mix` blends the result with the original, and `resize original` scales back to the input size.
-- **16 presets**: ready-made looks such as `@vhs`, `@vaporwave`, `@crt`, `@gameboy`, `@planet` and `@chunky`.
+- **20 presets**: ready-made looks such as `@vhs`, `@vaporwave`, `@crt`, `@cinematic`, `@noir`, `@comic`, `@neon` and `@chunky`.
 - **Animation**: sweep any parameter with `{from..to}` to create GIFs or frame sequences.
   Animated GIF input is processed frame by frame.
 - **Formats**: reads PNG, JPEG, GIF, BMP, TIFF and WebP; writes all of them except WebP.
@@ -143,13 +143,13 @@ The original interface still works: `sortmancy -i img/city/city.jpg -o out.jpg -
 | Group | Operations |
 | ----- | ---------- |
 | Sorting | `sort` |
-| Color | `invert`, `grayscale`, `threshold`, `posterize`, `brightness`, `contrast`, `gamma`, `saturation`, `hue`, `solarize`, `swap` (channel swap), `gradientmap` |
+| Color | `invert`, `grayscale`, `threshold`, `posterize`, `brightness`, `contrast`, `gamma`, `saturation`, `hue`, `solarize`, `swap` (channel swap), `gradientmap`, `autolevels`, `equalize`, `levels`, `curves`, `temperature`, `sepia`, `channelmix`, `lut` (`.cube` files and built-in looks) |
 | Glitch | `shift` (RGB split), `aberration`, `glitch` (slice displacement), `blocks` (block shuffle), `jpeg` (data corruption), `bend` (data bending), `echo`, `interlace`, `scatter`, `tracking` (VHS), `melt`, `wave`, `scanlines`, `noise` |
 | Distortion | `displace`, `swirl`, `ripple`, `bulge`, `polar`, `curvature`, `slitscan` |
 | Retro | `dither` with `floyd`, `atkinson`, `jarvis`, `stucki`, `burkes`, `sierra`, `bayer2/4/8` or `none`, palettes `bw`, `gray4`, `gameboy`, `cga`, `pico8`, `c64`, `sepia`, `vapor`, `websafe` or your own `#hex,#hex,...`; `quantize` (best N colors) |
-| Artistic | `halftone`, `bloom`, `oilpaint`, `kaleidoscope` |
+| Artistic | `ascii`, `voronoi`, `lowpoly`, `toon`, `neon`, `emboss`, `halftone`, `bloom`, `oilpaint`, `kaleidoscope`, `tile`, `droste` |
 | Geometry | `resize`, `crop`, `pixelate`, `mirror`, `flip`, `rotate` |
-| Filters & blending | `blur`, `sharpen`, `edges`, `vignette`, `mix` |
+| Filters & blending | `blur`, `gaussian`, `motionblur`, `zoomblur`, `median`, `dilate`, `erode`, `sharpen`, `edges`, `vignette`, `mix`, `blend` (13 blend modes) |
 
 ### Presets
 
@@ -171,6 +171,10 @@ The original interface still works: `sortmancy -i img/city/city.jpg -o out.jpg -
 | `@oil` | `oilpaint radius=4 \| saturation 1.2` |
 | `@planet` | `polar \| vignette 0.4` |
 | `@databend` | `bend delay=12347 feedback=0.6 \| interlace shift=6` |
+| `@cinematic` | `autolevels \| lut tealorange \| vignette 0.4` |
+| `@noir` | `lut noir \| vignette 0.6 \| noise amount=0.04 mono` |
+| `@comic` | `toon \| saturation 1.3` |
+| `@neon` | `neon` |
 
 `sortmancy presets` prints the full pipelines.
 
@@ -237,7 +241,7 @@ _ = imageio.SaveAnimation("out.gif", out)
 
 ## Gallery
 
-**[See the full gallery on the docs site →](https://marcr11.github.io/sortmancy/docs/gallery/)** It has 132 examples covering every sort option, operation, preset and animation, each with the command and the equivalent Go code.
+**[See the full gallery on the docs site →](https://marcr11.github.io/sortmancy/docs/gallery/)** It has 167 examples covering every sort option, operation, preset and animation, each with the command and the equivalent Go code.
 
 All examples start from [img/city/city.jpg](img/city/city.jpg).
 

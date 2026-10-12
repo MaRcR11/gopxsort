@@ -46,6 +46,8 @@ func init() {
 	registerFilters()
 	registerExtra()
 	registerDistort()
+	registerColorMore()
+	registerArtisticMore()
 }
 
 var intervalNames = []string{"threshold", "random", "waves", "edges", "none"}

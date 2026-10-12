@@ -16,7 +16,7 @@ layout: hextra-home
 
 <div class="hx:mb-12">
 {{< hextra/hero-subtitle >}}
-  A fast command line tool and library with 51 operations,&nbsp;<br class="hx:sm:block hx:hidden" />presets, pipelines and animation.
+  A fast command line tool and library with 74 operations,&nbsp;<br class="hx:sm:block hx:hidden" />presets, pipelines and animation.
 {{< /hextra/hero-subtitle >}}
 </div>
 
@@ -36,6 +36,9 @@ layout: hextra-home
   {{< gallery-item src="gallery/preset_vaporwave.jpg" caption="Vaporwave preset" >}}
   {{< gallery-item src="gallery/glitch.jpg" caption="Slice glitch" >}}
   {{< gallery-item src="gallery/preset_chunky.jpg" caption="Chunky preset" >}}
+  {{< gallery-item src="gallery/neon.jpg" caption="Neon edges" >}}
+  {{< gallery-item src="gallery/lowpoly.jpg" caption="Low poly" >}}
+  {{< gallery-item src="gallery/preset_cinematic.jpg" caption="Cinematic preset" >}}
 {{< /gallery >}}
 
 <div class="hx:mt-12"></div>
@@ -48,15 +51,15 @@ layout: hextra-home
     link="docs/sorting"
   >}}
   {{< hextra/feature-card
-    title="51 operations"
+    title="74 operations"
     icon="sparkles"
-    subtitle="Color, glitch, distortion, dithering, artistic and geometry effects. Every one works from the command line and from Go."
+    subtitle="Color grading, blend modes, LUTs, glitch, distortion, dithering, ASCII art, mosaics and more. Every one works from the command line and from Go."
     link="docs/reference"
   >}}
   {{< hextra/feature-card
     title="Pipelines and presets"
     icon="adjustments"
-    subtitle="Chain anything with `|`, blend with the original using `mix`, or start from 16 presets such as `@vhs`, `@crt` and `@vaporwave`."
+    subtitle="Chain anything with `|`, blend with the original using `mix`, or start from 20 presets such as `@vhs`, `@cinematic` and `@neon`."
     link="docs/cli"
   >}}
   {{< hextra/feature-card

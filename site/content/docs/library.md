@@ -48,6 +48,24 @@ retro := effects.Dither(glitched, effects.DitherOptions{
 })
 ```
 
+## Color grading and blending
+
+```go
+film, err := effects.LoadCubeLUT("film.cube")
+graded := effects.ApplyLUT(img, film, 0.8)
+glow := effects.Blend(graded, effects.GaussianBlur(graded, 12), effects.BlendScreen, 0.5)
+```
+
+Built-in looks are available without a file through `effects.LUTByName("tealorange")`, and `effects.NewLUT` builds a LUT from any Go function. `WriteCube` saves it as a `.cube` file for other editors.
+
+## ASCII art as text
+
+The `ascii` operation renders characters into an image. From Go you can also get the plain text:
+
+```go
+fmt.Print(effects.ASCII(img, 100, effects.DefaultASCIIChars))
+```
+
 ## Pipelines and presets
 
 Describe the whole chain as a string, the same way the command line does:

@@ -68,6 +68,9 @@ func main() {
 	if err := os.Chdir(work); err != nil {
 		log.Fatal(err)
 	}
+	if err := writeSampleLUT("film.cube"); err != nil {
+		log.Fatal(err)
+	}
 
 	img, err := imageio.Load("city.jpg")
 	if err != nil {
@@ -99,6 +102,22 @@ func main() {
 		}
 		fmt.Println("wrote README highlights into", *readme)
 	}
+}
+
+func writeSampleLUT(path string) error {
+	l, ok := effects.LUTByName("bleach")
+	if !ok {
+		return fmt.Errorf("built-in LUT bleach is missing")
+	}
+	f, err := os.Create(path)
+	if err != nil {
+		return err
+	}
+	if err := l.WriteCube(f, "film"); err != nil {
+		f.Close()
+		return err
+	}
+	return f.Close()
 }
 
 func ordered(all []catalog.Example) []catalog.Example {

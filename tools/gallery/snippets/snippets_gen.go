@@ -432,6 +432,83 @@ var Funcs = map[string]Func{
 		out = effects.GradientMap(img, colors)
 		return
 	},
+	"autolevels": func(img image.Image, outGIF string) (out image.Image, err error) {
+		out = effects.AutoLevels(img, 0.005)
+		return
+	},
+	"equalize": func(img image.Image, outGIF string) (out image.Image, err error) {
+		out = effects.Equalize(img)
+		return
+	},
+	"levels": func(img image.Image, outGIF string) (out image.Image, err error) {
+		out = effects.Levels(img, 0.05, 0.6, 1.2)
+		return
+	},
+	"curves": func(img image.Image, outGIF string) (out image.Image, err error) {
+		pts, err := effects.ParseCurve("0:0,0.25:0.15,0.6:0.75,1:1")
+		out = effects.Curves(img, pts)
+		return
+	},
+	"temperature": func(img image.Image, outGIF string) (out image.Image, err error) {
+		out = effects.Temperature(img, 0.5, 0)
+		return
+	},
+	"temperature__cool": func(img image.Image, outGIF string) (out image.Image, err error) {
+		out = effects.Temperature(img, -0.5, 0.2)
+		return
+	},
+	"sepia": func(img image.Image, outGIF string) (out image.Image, err error) {
+		out = effects.Sepia(img, 1)
+		return
+	},
+	"channelmix": func(img image.Image, outGIF string) (out image.Image, err error) {
+		out = effects.ChannelMix(img, [3][3]float64{
+			{0.6, 0.4, 0},
+			{0.2, 0.8, 0},
+			{0, 0.5, 0.6},
+		})
+		return
+	},
+	"lut": func(img image.Image, outGIF string) (out image.Image, err error) {
+		l, _ := effects.LUTByName("tealorange")
+		out = effects.ApplyLUT(img, l, 1)
+		return
+	},
+	"lut__cross": func(img image.Image, outGIF string) (out image.Image, err error) {
+		l, _ := effects.LUTByName("crossprocess")
+		out = effects.ApplyLUT(img, l, 0.8)
+		return
+	},
+	"lut__file": func(img image.Image, outGIF string) (out image.Image, err error) {
+		l, err := effects.LoadCubeLUT("film.cube")
+		out = effects.ApplyLUT(img, l, 1)
+		return
+	},
+	"blend_screen": func(img image.Image, outGIF string) (out image.Image, err error) {
+		p, err := pipeline.Parse("sort angle=270 interval=edges edge=0.15 | blend mode=screen")
+		out, err = p.Apply(img)
+		return
+	},
+	"blend_difference": func(img image.Image, outGIF string) (out image.Image, err error) {
+		p, err := pipeline.Parse("flip | blend mode=difference")
+		out, err = p.Apply(img)
+		return
+	},
+	"blend_overlay": func(img image.Image, outGIF string) (out image.Image, err error) {
+		p, err := pipeline.Parse("gaussian sigma=12 | blend mode=overlay")
+		out, err = p.Apply(img)
+		return
+	},
+	"blend_multiply": func(img image.Image, outGIF string) (out image.Image, err error) {
+		p, err := pipeline.Parse("gradientmap colors=vapor | blend mode=multiply amount=0.8")
+		out, err = p.Apply(img)
+		return
+	},
+	"blend__with": func(img image.Image, outGIF string) (out image.Image, err error) {
+		top, err := imageio.Load("kaleidoscope.jpg")
+		out = effects.Blend(img, top, effects.BlendSoftLight, 1)
+		return
+	},
 	"glitch": func(img image.Image, outGIF string) (out image.Image, err error) {
 		out = effects.Glitch(img, 30, 0.15, 7)
 		return
@@ -583,6 +660,42 @@ var Funcs = map[string]Func{
 		out = effects.Mirror(img, effects.MirrorQuad)
 		return
 	},
+	"ascii": func(img image.Image, outGIF string) (out image.Image, err error) {
+		out = effects.ASCIIImage(img, 160, effects.DefaultASCIIChars, false)
+		return
+	},
+	"ascii__color": func(img image.Image, outGIF string) (out image.Image, err error) {
+		out = effects.ASCIIImage(img, 120, effects.DefaultASCIIChars, true)
+		return
+	},
+	"voronoi": func(img image.Image, outGIF string) (out image.Image, err error) {
+		out = effects.Voronoi(img, 2000, 7)
+		return
+	},
+	"lowpoly": func(img image.Image, outGIF string) (out image.Image, err error) {
+		out = effects.LowPoly(img, 800, 7)
+		return
+	},
+	"toon": func(img image.Image, outGIF string) (out image.Image, err error) {
+		out = effects.Toon(img, 6, 0.2)
+		return
+	},
+	"neon": func(img image.Image, outGIF string) (out image.Image, err error) {
+		out = effects.Neon(img, 0.25, 12)
+		return
+	},
+	"emboss": func(img image.Image, outGIF string) (out image.Image, err error) {
+		out = effects.Emboss(img, 2, 45)
+		return
+	},
+	"tile": func(img image.Image, outGIF string) (out image.Image, err error) {
+		out = effects.Tile(img, 3, 3, true)
+		return
+	},
+	"droste": func(img image.Image, outGIF string) (out image.Image, err error) {
+		out = effects.Droste(img, 0.6, 6)
+		return
+	},
 	"resize": func(img image.Image, outGIF string) (out image.Image, err error) {
 		out = effects.Resize(img, 320, 180, effects.Bilinear)
 		return
@@ -613,6 +726,30 @@ var Funcs = map[string]Func{
 	},
 	"vignette": func(img image.Image, outGIF string) (out image.Image, err error) {
 		out = effects.Vignette(img, 0.8)
+		return
+	},
+	"gaussian": func(img image.Image, outGIF string) (out image.Image, err error) {
+		out = effects.GaussianBlur(img, 6)
+		return
+	},
+	"motionblur": func(img image.Image, outGIF string) (out image.Image, err error) {
+		out = effects.MotionBlur(img, 0, 40)
+		return
+	},
+	"zoomblur": func(img image.Image, outGIF string) (out image.Image, err error) {
+		out = effects.ZoomBlur(img, 0.3, 24)
+		return
+	},
+	"median": func(img image.Image, outGIF string) (out image.Image, err error) {
+		out = effects.Median(img, 4)
+		return
+	},
+	"dilate": func(img image.Image, outGIF string) (out image.Image, err error) {
+		out = effects.Dilate(img, 3)
+		return
+	},
+	"erode": func(img image.Image, outGIF string) (out image.Image, err error) {
+		out = effects.Erode(img, 3)
 		return
 	},
 	"preset_classic": func(img image.Image, outGIF string) (out image.Image, err error) {
@@ -692,6 +829,26 @@ var Funcs = map[string]Func{
 	},
 	"preset_databend": func(img image.Image, outGIF string) (out image.Image, err error) {
 		p, err := pipeline.ParseSeed("@databend", 7)
+		out, err = p.Apply(img)
+		return
+	},
+	"preset_cinematic": func(img image.Image, outGIF string) (out image.Image, err error) {
+		p, err := pipeline.ParseSeed("@cinematic", 7)
+		out, err = p.Apply(img)
+		return
+	},
+	"preset_noir": func(img image.Image, outGIF string) (out image.Image, err error) {
+		p, err := pipeline.ParseSeed("@noir", 7)
+		out, err = p.Apply(img)
+		return
+	},
+	"preset_comic": func(img image.Image, outGIF string) (out image.Image, err error) {
+		p, err := pipeline.ParseSeed("@comic", 7)
+		out, err = p.Apply(img)
+		return
+	},
+	"preset_neon": func(img image.Image, outGIF string) (out image.Image, err error) {
+		p, err := pipeline.ParseSeed("@neon", 7)
 		out, err = p.Apply(img)
 		return
 	},
