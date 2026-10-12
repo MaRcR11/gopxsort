@@ -52,7 +52,8 @@
   let hasResult = false;
   let initialState = readHash();
 
-  const worker = new Worker("worker.js");
+  const version = window.sortmancyAssetVersion ? "?v=" + window.sortmancyAssetVersion : "";
+  const worker = new Worker("worker.js" + version);
   worker.onmessage = (e) => {
     const m = e.data;
     if (m.type === "fatal") {
@@ -209,8 +210,8 @@
 
   function loadSample() {
     currentSource = loadSample;
-    el.original.src = "city.jpg";
-    fetch("city.jpg")
+    el.original.src = "city.jpg" + version;
+    fetch("city.jpg" + version)
       .then((r) => r.arrayBuffer())
       .then(sendImage)
       .catch((err) => setStatus("Could not load the sample photo: " + err, "error"));

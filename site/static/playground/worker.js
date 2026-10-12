@@ -1,4 +1,4 @@
-importScripts("wasm_exec.js");
+importScripts("wasm_exec.js" + self.location.search);
 
 const go = new Go();
 
@@ -6,7 +6,7 @@ self.sortmancyReady = () => {
   postMessage({ type: "ready", info: JSON.parse(self.sortmancy.info()) });
 };
 
-fetch("sortmancy.wasm")
+fetch("sortmancy.wasm" + self.location.search)
   .then((r) => {
     if (!r.ok) throw new Error("could not load sortmancy.wasm (HTTP " + r.status + ")");
     return r.arrayBuffer();
