@@ -1,5 +1,5 @@
-baseURL: "https://marcr11.github.io/sortcery/"
-title: sortcery
+baseURL: "https://marcr11.github.io/sortmancy/"
+title: sortmancy
 locale: en
 enableRobotsTXT: true
 enableGitInfo: false
@@ -37,7 +37,7 @@ menu:
         type: search
     - name: GitHub
       weight: 5
-      url: "https://github.com/MaRcR11/sortcery"
+      url: "https://github.com/MaRcR11/sortmancy"
       params:
         icon: github
 
@@ -64,7 +64,7 @@ params:
       tokenize: forward
   editURL:
     enable: true
-    base: "https://github.com/MaRcR11/sortcery/edit/main/site/content"
+    base: "https://github.com/MaRcR11/sortmancy/edit/main/site/content"
   highlight:
     copy:
       enable: true

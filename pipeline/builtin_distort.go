@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"image"
 
-	"github.com/MaRcR11/sortcery/effects"
-	"github.com/MaRcR11/sortcery/imageio"
+	"github.com/MaRcR11/sortmancy/effects"
+	"github.com/MaRcR11/sortmancy/imageio"
 )
 
 func registerDistort() {

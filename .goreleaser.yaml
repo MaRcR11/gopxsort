@@ -1,7 +1,7 @@
 version: 2
 
 builds:
-  - main: ./cmd/sortcery
+  - main: ./cmd/sortmancy
     env:
       - CGO_ENABLED=0
     goos: [linux, windows, darwin]

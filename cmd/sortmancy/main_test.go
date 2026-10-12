@@ -8,7 +8,7 @@ import (
 	"slices"
 	"testing"
 
-	"github.com/MaRcR11/sortcery/pipeline"
+	"github.com/MaRcR11/sortmancy/pipeline"
 )
 
 func TestParseOptions(t *testing.T) {

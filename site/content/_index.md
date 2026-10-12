@@ -1,9 +1,9 @@
 ---
-title: sortcery
+title: sortmancy
 layout: hextra-home
 ---
 
-{{< hextra/hero-badge link="https://github.com/MaRcR11/sortcery" >}}
+{{< hextra/hero-badge link="https://github.com/MaRcR11/sortmancy" >}}
   <span>Free and open source</span>
   {{< icon name="arrow-circle-right" attributes="height=14" >}}
 {{< /hextra/hero-badge >}}

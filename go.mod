@@ -1,4 +1,4 @@
-module github.com/MaRcR11/sortcery
+module github.com/MaRcR11/sortmancy
 
 go 1.21
 

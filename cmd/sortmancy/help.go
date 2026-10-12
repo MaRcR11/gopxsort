@@ -6,16 +6,16 @@ import (
 	"strings"
 	"text/tabwriter"
 
-	"github.com/MaRcR11/sortcery/pipeline"
+	"github.com/MaRcR11/sortmancy/pipeline"
 )
 
-const usage = `sortcery - pixel sorting and glitch effects
+const usage = `sortmancy - pixel sorting and glitch effects
 
 USAGE:
-    sortcery <operation> -i <input> -o <output> [--param value | param=value ...]
-    sortcery run -i <input> -o <output> "<op> [params] | <op> [params] | ..."
-    sortcery @<preset> -i <input> -o <output>
-    sortcery -i <input> -o <output> [-t <0-255>]      (classic threshold sort)
+    sortmancy <operation> -i <input> -o <output> [--param value | param=value ...]
+    sortmancy run -i <input> -o <output> "<op> [params] | <op> [params] | ..."
+    sortmancy @<preset> -i <input> -o <output>
+    sortmancy -i <input> -o <output> [-t <0-255>]      (classic threshold sort)
 
 COMMANDS:
     <operation>     run a single operation, e.g. sort, glitch, dither
@@ -46,13 +46,13 @@ ANIMATION:
     Animated GIF input is processed frame by frame.
 
 EXAMPLES:
-    sortcery sort -i city.jpg -o out.png --angle 90 --key hue
-    sortcery sort -i city.jpg -o out.png interval=edges edge=0.2 reverse
-    sortcery run -i city.jpg -o out.png "sort angle=45 lower=0.4 | shift | scanlines"
-    sortcery run -i city.jpg -o out.png "@chunky | @crt"
-    sortcery run -i city.jpg -o anim.gif --frames 30 --pingpong "sort lower={0.1..0.7}"
-    sortcery run -i "photos/*.jpg" -o sorted/ "sort angle=90"
-    cat in.png | sortcery @vhs -i - -o - > out.png
+    sortmancy sort -i city.jpg -o out.png --angle 90 --key hue
+    sortmancy sort -i city.jpg -o out.png interval=edges edge=0.2 reverse
+    sortmancy run -i city.jpg -o out.png "sort angle=45 lower=0.4 | shift | scanlines"
+    sortmancy run -i city.jpg -o out.png "@chunky | @crt"
+    sortmancy run -i city.jpg -o anim.gif --frames 30 --pingpong "sort lower={0.1..0.7}"
+    sortmancy run -i "photos/*.jpg" -o sorted/ "sort angle=90"
+    cat in.png | sortmancy @vhs -i - -o - > out.png
 `
 
 func printUsage(w io.Writer) {
@@ -72,9 +72,9 @@ func printOpList(w io.Writer) {
 func printOpHelp(w io.Writer, name string) error {
 	s, ok := pipeline.Lookup(name)
 	if !ok {
-		return fmt.Errorf("unknown operation %q, run \"sortcery list\"", name)
+		return fmt.Errorf("unknown operation %q, run \"sortmancy list\"", name)
 	}
-	fmt.Fprintf(w, "%s - %s\n\nUSAGE:\n    sortcery %s -i <input> -o <output>", s.Name, s.Help, s.Name)
+	fmt.Fprintf(w, "%s - %s\n\nUSAGE:\n    sortmancy %s -i <input> -o <output>", s.Name, s.Help, s.Name)
 	if len(s.Params) > 0 {
 		fmt.Fprint(w, " [--param value ...]")
 	}
